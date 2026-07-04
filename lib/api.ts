@@ -9,7 +9,7 @@ export function normalizeApiUrl(url: string) {
 
   try {
     const parsed = new URL(url, typeof window !== 'undefined' ? window.location.origin : API_ORIGIN);
-    if (parsed.origin === API_ORIGIN) {
+    if (parsed.origin === API_ORIGIN || parsed.origin === 'http://localhost:5000') {
       return `${API_PROXY_PREFIX}${parsed.pathname}${parsed.search}${parsed.hash}`;
     }
   } catch {
