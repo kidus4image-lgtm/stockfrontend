@@ -333,7 +333,7 @@ export default function PaymentsPage() {
                           <>
                             <button
                               type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeposit(pmt.id, pmt.dueDate); }}
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeposit(pmt.id, pmt.dueDate ?? undefined); }}
                               style={{
                                 background: 'rgba(59, 130, 246, 0.1)',
                                 border: '1px solid rgba(59, 130, 246, 0.3)',
@@ -358,7 +358,7 @@ export default function PaymentsPage() {
                             </button>
                             <button
                               type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id, pmt.dueDate); }}
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id, pmt.dueDate ?? undefined); }}
                               style={{
                                 background: 'rgba(245, 158, 11, 0.1)',
                                 border: '1px solid rgba(245, 158, 11, 0.3)',
@@ -387,7 +387,7 @@ export default function PaymentsPage() {
                           <>
                             <button
                               type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleClearCheque(pmt.id, pmt.dueDate); }}
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleClearCheque(pmt.id, pmt.dueDate ?? undefined); }}
                               style={{
                                 background: 'rgba(16, 185, 129, 0.1)',
                                 border: '1px solid rgba(16, 185, 129, 0.3)',
@@ -412,7 +412,7 @@ export default function PaymentsPage() {
                             </button>
                             <button
                               type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id, pmt.dueDate); }}
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id, pmt.dueDate ?? undefined); }}
                               style={{
                                 background: 'rgba(245, 158, 11, 0.1)',
                                 border: '1px solid rgba(245, 158, 11, 0.3)',

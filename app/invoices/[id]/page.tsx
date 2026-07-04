@@ -888,13 +888,13 @@ export default function InvoiceDetailPage() {
                       {pmt.status === 'Uncollected' && (
                         <div className="payment-actions" style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
                           {canManagePayments && (
-                            <button onClick={() => handleDeposit(pmt.id, pmt.dueDate)}
+                            <button onClick={() => handleDeposit(pmt.id, pmt.dueDate ?? undefined)}
                               className="btn-primary"
                               style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.3)' }}
                             >🏦 Deposit</button>
                           )}
                           {canManagePayments && (
-                            <button onClick={() => handleBounceCheque(pmt.id, pmt.dueDate)}
+                            <button onClick={() => handleBounceCheque(pmt.id, pmt.dueDate ?? undefined)}
                               className="btn-secondary"
                               style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', border: '1px solid rgba(244, 63, 94, 0.3)', color: 'var(--danger)', background: 'rgba(244, 63, 94, 0.05)' }}
                             >🚨 Bounce</button>
@@ -904,13 +904,13 @@ export default function InvoiceDetailPage() {
                       {pmt.status === 'Deposited' && (
                         <div className="payment-actions" style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
                           {canManagePayments && (
-                            <button onClick={() => handleClearCheque(pmt.id, pmt.dueDate)}
+                            <button onClick={() => handleClearCheque(pmt.id, pmt.dueDate ?? undefined)}
                               className="btn-primary"
                               style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--success)', border: '1px solid rgba(16, 185, 129, 0.3)' }}
                             >💰 Clear</button>
                           )}
                           {canManagePayments && (
-                            <button onClick={() => handleBounceCheque(pmt.id, pmt.dueDate)}
+                            <button onClick={() => handleBounceCheque(pmt.id, pmt.dueDate ?? undefined)}
                               className="btn-secondary"
                               style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', border: '1px solid rgba(244, 63, 94, 0.3)', color: 'var(--danger)', background: 'rgba(244, 63, 94, 0.05)' }}
                             >🚨 Bounce</button>
