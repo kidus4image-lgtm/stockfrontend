@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiFetch } from '../../../lib/api';
 import { showSuccess, showError } from '../../../lib/toast';
@@ -64,6 +64,14 @@ const TypeBadge = ({ type }: { type: string }) => (
 );
 
 export default function PurchasesPage() {
+  return (
+    <Suspense fallback={null}>
+      <PurchasesPageInner />
+    </Suspense>
+  );
+}
+
+function PurchasesPageInner() {
   const router = useRouter();
   const [purchases, setPurchases]   = useState<Purchase[]>([]);
   const [suppliers, setSuppliers]   = useState<Supplier[]>([]);
