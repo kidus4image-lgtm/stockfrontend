@@ -121,7 +121,7 @@ export default function Sidebar() {
       {/* ── Logo Header ── */}
       <div className="sidebar-header">
         <div className="sidebar-logo-icon">🛍️</div>
-        <h2>RetailFlow</h2>
+        <h2>Nexlify</h2>
         <button 
           className="mobile-hamburger" 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

@@ -263,7 +263,7 @@ export default function ChatBot() {
           }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #06b6d4, #0284c7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>🤖</div>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1rem', color: '#f8fafc', fontWeight: 700 }}>RetailFlow AI Analyst</h3>
+              <h3 style={{ margin: 0, fontSize: '1rem', color: '#f8fafc', fontWeight: 700 }}>Nexlify AI Analyst</h3>
               <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8' }}>Powered by Gemini • Ask anything about your retail data</p>
             </div>
           </div>

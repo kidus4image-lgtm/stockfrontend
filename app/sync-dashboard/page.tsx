@@ -96,7 +96,7 @@ export default function SyncDashboard() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               POS Sync Dashboard
             </h1>
-            <p className="text-slate-400 mt-2">Monitor and manage synchronization between your POS system and RetailFlow</p>
+            <p className="text-slate-400 mt-2">Monitor and manage synchronization between your POS system and Nexlify</p>
           </div>
 
           {message && (

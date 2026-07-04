@@ -10,7 +10,7 @@ import ApiFetchInterceptor from '../components/ApiFetchInterceptor';
 import SettingsProviderWrapper from '../components/SettingsProviderWrapper';
 
 export const metadata: Metadata = {
-  title: 'RetailFlow Pro',
+  title: 'Nexlify',
   description: 'Premium retail inventory and cash flow dashboard.',
 };
 

@@ -3,7 +3,7 @@ import autoTable from 'jspdf-autotable';
 
 // ─── Company Branding ───────────────────────────────────────────────
 export const COMPANY_BRAND = {
-  name: 'Astinka Pharmaceuticals',
+  name: 'Nexlify',
   address: '',
   phone: '',
   tin: '',

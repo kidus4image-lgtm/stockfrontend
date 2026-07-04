@@ -164,7 +164,7 @@ export default function TopNav() {
           )}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', letterSpacing: '0.5px', lineHeight: 1.2 }}>
-              {settings?.companyName || 'Astinka Pharmaceuticals'}
+              {settings?.companyName || 'Nexlify'}
             </span>
             <span style={{ fontSize: '0.65rem', color: '#6ee7b7', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>
               Inventory & Payment Hub

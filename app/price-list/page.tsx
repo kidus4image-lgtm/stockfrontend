@@ -366,7 +366,7 @@ export default function PriceListPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.85rem' }}>
               <div style={{ borderLeft: `2px solid ${accentColor}55`, paddingLeft: '0.6rem' }}>
                 <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>COMPANY NAME</span>
-                <span style={{ color: '#fff', fontWeight: 500 }}>{settings?.companyName || 'Astinka Pharmaceuticals'}</span>
+                <span style={{ color: '#fff', fontWeight: 500 }}>{settings?.companyName || 'Nexlify'}</span>
               </div>
               <div style={{ borderLeft: `2px solid ${accentColor}55`, paddingLeft: '0.6rem' }}>
                 <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>ADDRESS</span>

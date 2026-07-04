@@ -149,7 +149,7 @@ export default function LoginPage() {
       <div className="login-content-wrapper">
         <div className="login-context-section">
           <div className="context-content">
-            <div className="context-badge">RetailFlow 2.0</div>
+            <div className="context-badge">Nexlify 2.0</div>
             <h1 className="context-title">Master Your Retail Operations</h1>
             <p className="context-subtitle">Absolute control over inventory, sales, and cash flow in one seamless, high-performance platform.</p>
             
@@ -192,14 +192,14 @@ export default function LoginPage() {
             <div className="login-header">
               <div className="login-logo-container">
                 <div className="login-logo-icon">🛡️</div>
-                <span className="login-logo-text">RetailFlow</span>
+                <span className="login-logo-text">Nexlify</span>
               </div>
               <h2>
                 {isRegistering ? 'Create Account' : 'Welcome Back'}
               </h2>
               <p>
                 {isRegistering
-                  ? 'Register for a RetailFlow account'
+                  ? 'Register for a Nexlify account'
                   : 'Sign in to access your secure dashboard'}
               </p>
             </div>
@@ -336,7 +336,7 @@ export default function LoginPage() {
           </form>
 
           <div className="auth-switch auth-switch-footer">
-            🛡️ RetailFlow — Secure Retail Inventory &amp; Cash Flow System. Authorized access only.
+            🛡️ Nexlify — Secure Retail Inventory &amp; Cash Flow System. Authorized access only.
           </div>
         </div>
       </div>
