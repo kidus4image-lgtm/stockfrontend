@@ -279,7 +279,7 @@ export default function CustomersPage() {
   };
 
   return (
-    <div className="dashboard-container" style={{ height: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div className="dashboard-container customer-page-shell" style={{ display: 'flex', flexDirection: 'column' }}>
       <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexShrink: 0, flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 className="text-gradient" style={{ fontSize: '2.2rem', margin: 0, fontWeight: 800 }}>Customer Ledger Accounts</h1>
@@ -299,28 +299,67 @@ export default function CustomersPage() {
           No customers registered. Create a ledger account to begin.
         </div>
       ) : (
-        <div className="customer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '2rem', flex: 1, minHeight: 0, height: '100%', overflow: 'hidden' }}>
-          
+        <div className="customer-grid" style={{ flex: 1, minHeight: 0 }}>
+
           {/* Customer List */}
-          <div className="glass-panel customer-list-panel" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+          <div className="glass-panel customer-list-panel" style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ marginBottom: '1rem', flexShrink: 0 }}>
-              <input 
-                type="text" 
-                placeholder="Search customers by name or TIN..." 
-                className="form-control" 
+              <input
+                type="text"
+                placeholder="Search customers by name or TIN..."
+                className="form-control"
                 style={{ width: '100%', padding: '0.65rem 1rem', borderRadius: '8px' }}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
-            <div className="table-wrap" style={{ flex: 1, overflowY: 'auto', marginBottom: '1rem' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+
+            {/* Mobile search results */}
+            {searchQuery && (
+              <div className="customer-mobile-search-results">
+                {(() => {
+                  const filteredCustomers = customers.filter(c => c.customerName.toLowerCase().includes(searchQuery.toLowerCase()) || (c.tinNumber && c.tinNumber.includes(searchQuery)));
+                  if (filteredCustomers.length === 0) {
+                    return <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '1.5rem' }}>No customers match your search.</p>;
+                  }
+                  return filteredCustomers.map((cust) => (
+                    <div
+                      key={cust.id}
+                      className="customer-mobile-search-item"
+                      onClick={() => handleSelectCustomer(cust)}
+                    >
+                      <div>
+                        <span
+                          style={{ fontWeight: '700', color: 'var(--accent-hover)', cursor: 'pointer', textDecoration: 'underline' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/customers/${cust.id}`);
+                          }}
+                        >
+                          {cust.customerName}
+                        </span>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                          TIN: {cust.tinNumber || '-'}
+                          {cust.salesRep ? ` · Rep: ${cust.salesRep.firstName} ${cust.salesRep.lastName}` : ''}
+                        </div>
+                      </div>
+                      <div style={{ color: 'var(--danger)', fontWeight: '600', fontSize: '0.85rem' }}>
+                        ${(cust.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            )}
+
+            {/* Desktop table */}
+            <div className="table-wrap customer-list-scroll customer-table-desktop-only">
+              <table className="customer-table" style={{ borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                     <th style={{ padding: '0.75rem 0.5rem' }}>Customer</th>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>TIN Number</th>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Rep</th>
+                    <th className="customer-table-col-tin" style={{ padding: '0.75rem 0.5rem' }}>TIN Number</th>
+                    <th className="customer-table-col-rep" style={{ padding: '0.75rem 0.5rem' }}>Rep</th>
                     <th style={{ padding: '0.75rem 0.5rem' }}>Outstanding</th>
                   </tr>
                 </thead>
@@ -340,18 +379,22 @@ export default function CustomersPage() {
                         }}
                         onClick={() => handleSelectCustomer(cust)}
                       >
-                        <td 
-                          style={{ padding: '0.75rem 0.5rem', fontWeight: '600', color: 'var(--accent-hover)', cursor: 'pointer', textDecoration: 'underline' }}
-                          title="Click to view customer dashboard"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/customers/${cust.id}`);
-                          }}
+                        <td
+                          style={{ padding: '0.75rem 0.5rem', cursor: 'default' }}
                         >
-                          {cust.customerName}
+                          <span
+                            style={{ fontWeight: '700', color: 'var(--accent-hover)', cursor: 'pointer', textDecoration: 'underline', display: 'block' }}
+                            title="Click to view customer dashboard"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/customers/${cust.id}`);
+                            }}
+                          >
+                            {cust.customerName}
+                          </span>
                         </td>
-                        <td style={{ padding: '0.75rem 0.5rem', color: 'var(--text-muted)' }}>{cust.tinNumber || '-'}</td>
-                        <td style={{ padding: '0.75rem 0.5rem', fontSize: '0.8rem', color: cust.salesRep ? '#60a5fa' : 'var(--text-muted)' }}>
+                        <td className="customer-table-col-tin" style={{ padding: '0.75rem 0.5rem', color: 'var(--text-muted)' }}>{cust.tinNumber || '-'}</td>
+                        <td className="customer-table-col-rep" style={{ padding: '0.75rem 0.5rem', fontSize: '0.8rem', color: cust.salesRep ? '#60a5fa' : 'var(--text-muted)' }}>
                           {cust.salesRep ? `${cust.salesRep.firstName} ${cust.salesRep.lastName}` : '—'}
                         </td>
                         <td style={{ padding: '0.75rem 0.5rem', color: 'var(--danger)', fontWeight: '600' }}>
@@ -363,16 +406,16 @@ export default function CustomersPage() {
                 </tbody>
               </table>
             </div>
-            
+
             {/* Pagination Controls */}
             {(() => {
               const filteredCustomers = customers.filter(c => c.customerName.toLowerCase().includes(searchQuery.toLowerCase()) || (c.tinNumber && c.tinNumber.includes(searchQuery)));
               const totalPages = Math.max(1, Math.ceil(filteredCustomers.length / rowsPerPage));
               return (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: 'auto', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
-                  <button 
-                    className="btn-secondary" 
-                    disabled={currentPage === 1} 
+                <div className="customer-table-desktop-only" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: 'auto', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
+                  <button
+                    className="btn-secondary"
+                    disabled={currentPage === 1}
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
                   >
@@ -381,9 +424,9 @@ export default function CustomersPage() {
                   <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                     Page {currentPage} of {totalPages}
                   </span>
-                  <button 
-                    className="btn-secondary" 
-                    disabled={currentPage >= totalPages} 
+                  <button
+                    className="btn-secondary"
+                    disabled={currentPage >= totalPages}
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
                   >
@@ -396,7 +439,7 @@ export default function CustomersPage() {
 
           {/* Customer Details Panel */}
           {selectedCust && (
-            <div className="glass-panel customer-detail-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+            <div className="glass-panel customer-detail-panel" style={{ display: 'flex', flexDirection: 'column' }}>
               
               {/* Detailed view header */}
               <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0, gap: '1rem' }}>
@@ -500,7 +543,7 @@ export default function CustomersPage() {
               </div>
 
               {/* Scrollable Tab content panel */}
-              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.25rem', minHeight: 0 }}>
+              <div className="customer-tab-content">
                 {detailsLoading ? (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 0', color: 'var(--text-muted)' }}>
                     <span style={{ fontSize: '2rem', marginBottom: '1rem', animation: 'spin 1.5s infinite linear', display: 'inline-block' }}>⏳</span>
@@ -810,10 +853,11 @@ export default function CustomersPage() {
           zIndex: 9999,
           padding: '1.5rem'
         }}>
-          <div className="glass-panel" style={{
+          <div className="glass-panel customer-modal" style={{
             width: '100%',
             maxWidth: '1080px',
-            padding: '2.5rem',
+            maxHeight: '90vh',
+            overflowY: 'auto',
             borderRadius: '20px',
             background: 'rgba(17, 24, 39, 0.98)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -865,7 +909,7 @@ export default function CustomersPage() {
               )}
 
               {/* TWO COLUMN CONTENT */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1.2fr', gap: '2.5rem', marginBottom: '2rem' }}>
+              <div className="customer-modal-grid" style={{ marginBottom: '2rem' }}>
                 
                 {/* LEFT COLUMN: FORM CONTROLS */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -873,7 +917,7 @@ export default function CustomersPage() {
                     1. Receipt Details
                   </h4>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+                  <div className="payment-method-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
                     <div>
                       <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Payment Method</label>
                       <select
@@ -934,7 +978,7 @@ export default function CustomersPage() {
                   </div>
 
                   {paymentMethod === 'Cheque' ? (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+                    <div className="date-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
                       <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Cheque Number</label>
                         <input
@@ -1112,7 +1156,7 @@ export default function CustomersPage() {
 
               </div>
 
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '1.5rem' }}>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', flexWrap: 'wrap', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '1.5rem' }}>
                 <button
                   type="button"
                   className="btn-secondary"

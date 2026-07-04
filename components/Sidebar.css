@@ -1,10 +1,12 @@
 /* ═══════════════════════════════════════════════
    SIDEBAR — Premium Glassmorphism Navigation
+   Mobile-first: base rules are the compact top-bar/hamburger
+   layout; the min-width query promotes it to a fixed left rail.
    ═══════════════════════════════════════════════ */
 
 .sidebar {
-  width: 270px;
-  height: 100vh;
+  width: 100%;
+  height: auto;
   position: sticky;
   top: 0;
   display: flex;
@@ -12,20 +14,21 @@
   border-radius: 0;
   border-left: none;
   border-top: none;
-  border-bottom: none;
+  border-right: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   background: rgba(10, 14, 23, 0.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
-  z-index: 9999;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  z-index: 100;
 }
 
 /* ── Header / Logo ── */
 .sidebar-header {
-  padding: 1.25rem 1.5rem;
+  padding: 0.85rem 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
   flex-shrink: 0;
@@ -61,21 +64,26 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #475569;
-  padding: 1.25rem 1rem 0.5rem 1rem;
+  padding: 1rem 0.5rem 0.35rem 0.5rem;
   user-select: none;
 }
 
-/* ── Nav Container ── */
+/* ── Nav Container (collapsed accordion on mobile until opened) ── */
 .sidebar-nav {
-  padding: 0.5rem 0.75rem;
-  flex: 1;
-  display: flex;
+  display: none;
+  padding: 0.75rem 1rem;
   flex-direction: column;
   gap: 2px;
+  max-height: 70vh;
   overflow-y: auto;
   overflow-x: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.05) transparent;
+}
+
+.sidebar.mobile-open .sidebar-nav {
+  display: flex;
 }
 
 .sidebar-nav::-webkit-scrollbar {
@@ -244,12 +252,17 @@
   opacity: 1;
 }
 
-/* ── Footer / User Card ── */
+/* ── Footer / User Card (collapsed on mobile until opened) ── */
 .sidebar-footer {
-  padding: 0.75rem;
+  display: none;
+  padding: 0.75rem 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.07);
   flex-shrink: 0;
   background: rgba(10, 14, 23, 0.6);
+}
+
+.sidebar.mobile-open .sidebar-footer {
+  display: block;
 }
 
 .sidebar-user-card {
@@ -351,9 +364,9 @@
   border-color: rgba(239, 68, 68, 0.25);
 }
 
-/* ── Mobile Hamburger ── */
+/* ── Mobile Hamburger (base: visible; hidden once promoted to a rail) ── */
 .mobile-hamburger {
-  display: none;
+  display: flex;
   background: transparent;
   border: none;
   color: var(--text-main);
@@ -374,57 +387,40 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
-/* ── Mobile ── */
-@media (max-width: 768px) {
-  .mobile-hamburger {
-    display: flex;
-  }
-
+/* ── Desktop / tablet (769px and up): promote to a fixed left rail ── */
+@media (min-width: 769px) {
   .sidebar {
-    width: 100%;
-    height: auto;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    border-right: none;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-    background: rgba(10, 14, 23, 0.96);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    width: 270px;
+    height: 100vh;
+    border-bottom: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+    z-index: 9999;
   }
 
   .sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.85rem 1.25rem;
-  }
-
-  .sidebar-nav {
-    display: none;
-    padding: 0.75rem 1rem;
-    max-height: 70vh;
-    overflow-y: auto;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-  }
-
-  .sidebar.mobile-open .sidebar-nav {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .sidebar-footer {
-    display: none;
-    padding: 0.75rem 1rem;
-  }
-
-  .sidebar.mobile-open .sidebar-footer {
-    display: block;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 1.25rem 1.5rem;
+    justify-content: flex-start;
   }
 
   .sidebar-section-label {
-    padding: 1rem 0.5rem 0.35rem 0.5rem;
+    padding: 1.25rem 1rem 0.5rem 1rem;
+  }
+
+  .mobile-hamburger {
+    display: none;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    padding: 0.5rem 0.75rem;
+    flex: 1;
+    max-height: none;
+    border-top: none;
+  }
+
+  .sidebar-footer {
+    display: block;
+    padding: 0.75rem;
   }
 }

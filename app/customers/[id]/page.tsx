@@ -401,10 +401,10 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="dashboard-container">
-      <header className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+      <header className="no-print cust-detail-header">
         <div>
-          <button 
-            onClick={() => router.push('/customers')} 
+          <button
+            onClick={() => router.push('/customers')}
             style={{ background: 'transparent', border: 'none', color: 'var(--accent-hover)', cursor: 'pointer', marginBottom: '1rem', fontWeight: 'bold' }}
           >
             &larr; Back to Accounts
@@ -417,24 +417,24 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
             </p>
           )}
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <button className="btn-primary" onClick={() => setShowPaymentModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #10b981, #059669)', border: 'none' }}>
+        <div className="cust-detail-actions">
+          <button className="btn-primary" onClick={() => setShowPaymentModal(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #10b981, #059669)', border: 'none' }}>
             💸 Register Bulk Payment
           </button>
-          <button className="btn-secondary" onClick={() => router.push(`/customers/${customer.id}/report`)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button className="btn-secondary" onClick={() => router.push(`/customers/${customer.id}/report`)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
             📄 Printable Report
           </button>
-          <button className="btn-secondary" onClick={() => router.push(`/customers/${customer.id}/edit`)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(96, 165, 250, 0.15)', border: '1px solid rgba(96, 165, 250, 0.3)', color: '#60a5fa' }}>
+          <button className="btn-secondary" onClick={() => router.push(`/customers/${customer.id}/edit`)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'rgba(96, 165, 250, 0.15)', border: '1px solid rgba(96, 165, 250, 0.3)', color: '#60a5fa' }}>
             ✏️ Edit Customer
           </button>
-          <button className="btn-primary" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button className="btn-primary" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
             🖨️ Print Dashboard
           </button>
         </div>
       </header>
 
       {/* TAB BAR */}
-      <div className="no-print" style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.75rem' }}>
+      <div className="no-print cust-detail-tab-bar">
         {(['overview', 'invoices', 'payments'] as const).map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             style={{
@@ -484,10 +484,9 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
           zIndex: 9999,
           padding: '1.5rem'
         }}>
-          <div className="glass-panel" style={{
+          <div className="glass-panel cust-detail-modal-content" style={{
             width: '100%',
             maxWidth: '1080px',
-            padding: '2.5rem',
             borderRadius: '20px',
             background: 'rgba(17, 24, 39, 0.98)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -539,7 +538,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
               )}
 
               {/* TWO COLUMN CONTENT */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1.2fr', gap: '2.5rem', marginBottom: '2rem' }}>
+              <div className="cust-detail-modal-grid">
                 
                 {/* LEFT COLUMN: FORM CONTROLS */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -891,42 +890,43 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       )}
 
       {/* FILTERS */}
-      <div className="glass-panel no-print" style={{ padding: '1.5rem', marginBottom: '2rem', display: 'flex', gap: '2rem', alignItems: 'center' }}>
-        <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>Filters</h3>
-        
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Time Period:</label>
-          <select 
-            className="form-control" 
-            value={timeFilter} 
-            onChange={(e) => setTimeFilter(e.target.value)}
-            style={{ width: 'auto', padding: '0.5rem', fontSize: '0.85rem' }}
-          >
-            <option value="all">All Time</option>
-            <option value="thisMonth">This Month</option>
-            <option value="thisYear">This Year</option>
-          </select>
-        </div>
+      <div className="glass-panel no-print" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
+        <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', color: 'var(--text-main)' }}>Filters</h3>
+        <div className="cust-detail-filters">
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Time Period:</label>
+            <select
+              className="form-control"
+              value={timeFilter}
+              onChange={(e) => setTimeFilter(e.target.value)}
+              style={{ width: 'auto', padding: '0.5rem', fontSize: '0.85rem' }}
+            >
+              <option value="all">All Time</option>
+              <option value="thisMonth">This Month</option>
+              <option value="thisYear">This Year</option>
+            </select>
+          </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Invoice Status:</label>
-          <select 
-            className="form-control" 
-            value={invoiceStatusFilter} 
-            onChange={(e) => setInvoiceStatusFilter(e.target.value)}
-            style={{ width: 'auto', padding: '0.5rem', fontSize: '0.85rem' }}
-          >
-            <option value="All">All Statuses</option>
-            <option value="Paid">Paid</option>
-            <option value="Overdue">Overdue</option>
-            <option value="Critical">Critical</option>
-            <option value="Upcoming">Upcoming</option>
-          </select>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Invoice Status:</label>
+            <select
+              className="form-control"
+              value={invoiceStatusFilter}
+              onChange={(e) => setInvoiceStatusFilter(e.target.value)}
+              style={{ width: 'auto', padding: '0.5rem', fontSize: '0.85rem' }}
+            >
+              <option value="All">All Statuses</option>
+              <option value="Paid">Paid</option>
+              <option value="Overdue">Overdue</option>
+              <option value="Critical">Critical</option>
+              <option value="Upcoming">Upcoming</option>
+            </select>
+          </div>
         </div>
       </div>
 
       {/* CHARTS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem', marginBottom: '2rem' }}>
+      <div className="cust-detail-charts-grid">
         <div className="glass-panel" style={{ padding: '2rem' }}>
           <h3 style={{ marginTop: 0, marginBottom: '1.5rem', fontSize: '1.25rem', color: 'var(--accent-hover)' }}>Recent Invoices (Amt vs Remaining)</h3>
           <div style={{ height: '300px', width: '100%' }}>
@@ -1006,7 +1006,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--text-main)' }}>Filtered Invoices Report</h3>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className="cust-detail-invoice-filters">
             <input type="text" placeholder="🔍 Search invoice..." value={invoiceSearch} onChange={e => { setInvoiceSearch(e.target.value); setCurrentPageInvoices(1); }}
               style={{ padding: '0.4rem 0.65rem', borderRadius: '8px', fontSize: '0.8rem', width: '150px' }} />
             <select value={invoiceStatusFilter} onChange={e => { setInvoiceStatusFilter(e.target.value); setCurrentPageInvoices(1); }}
@@ -1037,7 +1037,52 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
             </select>
           </div>
         </div>
-        <div style={{ overflowX: 'auto' }}>
+        <div className="cust-detail-table-wrap">
+          <div className="tbl-mobile">
+            {(() => {
+              const paginatedInvoices = filteredInvoices.slice((currentPageInvoices - 1) * rowsPerPage, currentPageInvoices * rowsPerPage);
+              return paginatedInvoices.length > 0 ? (
+                paginatedInvoices.map((inv: any) => (
+                  <div key={inv.id} className="gen-mobile-card" onClick={() => router.push(`/invoices/${inv.id}`)} style={{ cursor: 'pointer' }}>
+                    <div className="gen-mobile-card-header">
+                      <span className="gen-mobile-card-title">{inv.invoiceNumber}</span>
+                      <span style={{
+                        background: inv.status === 'Paid' || inv.computedStatus === 'Paid' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                        color: inv.status === 'Paid' || inv.computedStatus === 'Paid' ? 'var(--success)' : 'var(--warning)',
+                        padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600'
+                      }}>
+                        {(() => {
+                          const raw = inv.computedStatus || inv.status;
+                          return raw === 'Overdue' ? 'Overdue - Not Paid' : raw === 'Critical' ? 'Critical - Not Paid' : raw;
+                        })()}
+                      </span>
+                    </div>
+                    <div className="gen-mobile-card-body">
+                      <div className="gen-mobile-card-row">
+                        <span className="gen-mobile-card-label">Bill Date</span>
+                        <span className="gen-mobile-card-value">{new Date(inv.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <div className="gen-mobile-card-row">
+                        <span className="gen-mobile-card-label">Due Date</span>
+                        <span className="gen-mobile-card-value">{new Date(inv.paymentDate).toLocaleDateString()}</span>
+                      </div>
+                      <div className="gen-mobile-card-row">
+                        <span className="gen-mobile-card-label">Total Amount</span>
+                        <span className="gen-mobile-card-value" style={{ fontWeight: 600 }}>${inv.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="gen-mobile-card-row">
+                        <span className="gen-mobile-card-label">Remaining</span>
+                        <span className="gen-mobile-card-value" style={{ color: inv.remainingPayment > 0 ? 'var(--danger)' : 'var(--success)', fontWeight: 600 }}>${inv.remainingPayment.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No invoices match the selected filters.</div>
+              );
+            })()}
+          </div>
+          <div className="tbl-desktop">
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
@@ -1087,6 +1132,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
               })()}
             </tbody>
           </table>
+          </div>
           
           {/* Pagination Controls */}
           {(() => {
@@ -1123,7 +1169,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       <div className="glass-panel" style={{ padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--text-main)' }}>Filtered Payments Report</h3>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className="cust-detail-payment-filters">
             <input type="text" placeholder="🔍 Search cheque/slip..." value={paymentSearch} onChange={e => { setPaymentSearch(e.target.value); setCurrentPagePayments(1); }}
               style={{ padding: '0.4rem 0.65rem', borderRadius: '8px', fontSize: '0.8rem', width: '140px' }} />
             <select value={paymentStatusFilter} onChange={e => { setPaymentStatusFilter(e.target.value); setCurrentPagePayments(1); }}
@@ -1157,7 +1203,78 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
             </select>
           </div>
         </div>
-        <div style={{ overflowX: 'auto' }}>
+        <div className="cust-detail-table-wrap">
+          <div className="tbl-mobile">
+            {(() => {
+              const paginatedPayments = filteredPayments.slice((currentPagePayments - 1) * rowsPerPage, currentPagePayments * rowsPerPage);
+              return paginatedPayments.length > 0 ? (
+                paginatedPayments.map((pmt: any) => (
+                  <div key={pmt.id} className="gen-mobile-card">
+                    <div className="gen-mobile-card-header">
+                      <span className="gen-mobile-card-title">{new Date(pmt.receivedDate).toLocaleDateString()}</span>
+                      <span style={{
+                        background: pmt.status === 'Collected' ? 'rgba(16, 185, 129, 0.15)' : pmt.status === 'Deposited' ? 'rgba(59, 130, 246, 0.15)' : pmt.status === 'Bounced' || pmt.status === 'Void' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                        color: pmt.status === 'Collected' ? 'var(--success)' : pmt.status === 'Deposited' ? '#60a5fa' : pmt.status === 'Bounced' || pmt.status === 'Void' ? 'var(--danger)' : 'var(--warning)',
+                        padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600'
+                      }}>
+                        {pmt.status}
+                      </span>
+                    </div>
+                    <div className="gen-mobile-card-body">
+                      <div className="gen-mobile-card-row">
+                        <span className="gen-mobile-card-label">Inv. Ref</span>
+                        <span className="gen-mobile-card-value" style={{ color: 'var(--accent-hover)', cursor: 'pointer', textDecoration: 'underline' }}
+                          onClick={() => { if (pmt.invoiceId) router.push(`/invoices/${pmt.invoiceId}`); }}
+                        >{pmt.invoiceNumber}</span>
+                      </div>
+                      <div className="gen-mobile-card-row">
+                        <span className="gen-mobile-card-label">Method</span>
+                        <span className="gen-mobile-card-value">{pmt.paymentMethod}</span>
+                      </div>
+                      <div className="gen-mobile-card-row">
+                        <span className="gen-mobile-card-label">Bank / Ref</span>
+                        <span className="gen-mobile-card-value" style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                          {pmt.bank ? `Bank: ${pmt.bank}` : ''}{pmt.chequeNumber ? ` | Chq: ${pmt.chequeNumber}` : ''}{pmt.slipNumber ? ` | Slip: ${pmt.slipNumber}` : ''}
+                        </span>
+                      </div>
+                      <div className="gen-mobile-card-row">
+                        <span className="gen-mobile-card-label">Amount</span>
+                        <span className="gen-mobile-card-value" style={{ fontWeight: 600, color: 'var(--success)' }}>+${pmt.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+                    <div className="gen-mobile-card-actions no-print">
+                      {pmt.status === 'Uncollected' && pmt.paymentMethod === 'Cheque' && (
+                        <>
+                          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeposit(pmt.id); }}
+                            style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa', padding: '0.25rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}>Deposit</button>
+                          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id); }}
+                            style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: 'var(--warning)', padding: '0.25rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}>Bounce</button>
+                        </>
+                      )}
+                      {pmt.status === 'Deposited' && pmt.paymentMethod === 'Cheque' && (
+                        <>
+                          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleClearCheque(pmt.id); }}
+                            style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: 'var(--success)', padding: '0.25rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}>Clear</button>
+                          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id); }}
+                            style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: 'var(--warning)', padding: '0.25rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}>Bounce</button>
+                        </>
+                      )}
+                      {pmt.status !== 'Void' && (
+                        <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleVoidPayment(pmt.id); }}
+                          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--danger)', padding: '0.25rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}>Void</button>
+                      )}
+                      {pmt.status === 'Void' && (
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic' }}>No Actions</span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No payments match the selected filters.</div>
+              );
+            })()}
+          </div>
+          <div className="tbl-desktop">
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
@@ -1361,6 +1478,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
               })()}
             </tbody>
           </table>
+          </div>
           
           {/* Pagination Controls */}
           {(() => {
@@ -1401,6 +1519,48 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
           ) : ledger.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>No ledger entries found.</div>
           ) : (
+            <>
+            <div className="tbl-mobile">
+              {ledger.map((entry) => (
+                <div key={entry.id} className="gen-mobile-card">
+                  <div className="gen-mobile-card-header">
+                    <span className="gen-mobile-card-title">{new Date(entry.date).toLocaleDateString()}</span>
+                    <span style={{
+                      padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600,
+                      background: entry.type.includes('void') || entry.type.includes('reversed')
+                        ? 'rgba(244,63,94,0.1)' : entry.type === 'overpayment'
+                        ? 'rgba(167,139,250,0.15)' : entry.type === 'extra_payment_used' || entry.type === 'credit_applied'
+                        ? 'rgba(251,191,36,0.15)' : 'rgba(16,185,129,0.1)',
+                      color: entry.type.includes('void') || entry.type.includes('reversed')
+                        ? 'var(--danger)' : entry.type === 'overpayment'
+                        ? '#a78bfa' : entry.type === 'extra_payment_used' || entry.type === 'credit_applied'
+                        ? '#fbbf24' : 'var(--success)'
+                    }}>
+                      {entry.type.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <div className="gen-mobile-card-body">
+                    <div className="gen-mobile-card-row">
+                      <span className="gen-mobile-card-label">Description</span>
+                      <span className="gen-mobile-card-value">{entry.description}</span>
+                    </div>
+                    <div className="gen-mobile-card-row">
+                      <span className="gen-mobile-card-label">Debit</span>
+                      <span className="gen-mobile-card-value" style={{ color: entry.debit > 0 ? 'var(--danger)' : 'var(--text-secondary)' }}>
+                        {entry.debit > 0 ? entry.debit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
+                      </span>
+                    </div>
+                    <div className="gen-mobile-card-row">
+                      <span className="gen-mobile-card-label">Credit</span>
+                      <span className="gen-mobile-card-value" style={{ color: entry.credit > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
+                        {entry.credit > 0 ? entry.credit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="tbl-desktop">
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
                 <thead>
@@ -1455,6 +1615,8 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                 </tbody>
               </table>
             </div>
+            </div>
+            </>
           )}
         </div>
       )}

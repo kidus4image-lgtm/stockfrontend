@@ -192,13 +192,13 @@ export default function PaymentsPage() {
 
   return (
     <div className="dashboard-container">
-      <header style={{ marginBottom: '2.5rem' }}>
+      <header className="gen-page-header" style={{ marginBottom: '2.5rem' }}>
         <h1 className="text-gradient" style={{ fontSize: '2.5rem' }}>Settlement Journal</h1>
         <p style={{ color: 'var(--text-muted)' }}>Corporate audit trail of all Cash and Cheque settlements, with clear status and maturity records.</p>
       </header>
 
       {/* Search & Filter Controls */}
-      <div className="glass-panel" style={{ padding: '1.25rem', marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div className="glass-panel gen-page-filters" style={{ padding: '1.25rem', marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: '240px' }}>
           <input
             type="text"
@@ -231,278 +231,427 @@ export default function PaymentsPage() {
           No settlement logs found. Select an invoice to add payments.
         </div>
       ) : (
-        <div className="glass-panel" style={{ padding: '1rem', overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                <th style={{ padding: '1rem' }}>Invoice No.</th>
-                <th style={{ padding: '1rem' }}>Customer</th>
-                <th style={{ padding: '1rem' }}>Method</th>
-                <th style={{ padding: '1rem' }}>Amount</th>
-                <th style={{ padding: '1rem' }}>Bank / Slip</th>
-                <th style={{ padding: '1rem' }}>Cheque Number</th>
-                <th style={{ padding: '1rem' }}>Maturity Date</th>
-                <th style={{ padding: '1rem' }}>Status</th>
-                <th style={{ padding: '1rem', textAlign: 'center' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(() => {
-                const paginatedPayments = filteredPayments.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                return paginatedPayments.map((pmt) => (
-                  <tr
-                    key={pmt.id}
-                    style={{
-                      borderBottom: '1px solid var(--border-color)',
-                      fontSize: '0.95rem',
-                      cursor: 'pointer',
-                      transition: 'background 0.2s'
-                    }}
-                    onClick={() => router.push(`/invoices/${pmt.invoice.id}`)}
-                    onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
-                    onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
-                  >
-                    <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--accent-hover)' }}>{pmt.invoice.invoiceNumber}</td>
-                    <td 
-                      style={{ padding: '1rem', fontWeight: '500', cursor: 'pointer', textDecoration: 'underline', color: 'var(--accent-hover)' }}
-                      title="Click to view customer dashboard"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/customers/${pmt.invoice.customer.id}`);
-                      }}
-                    >
-                      {pmt.invoice.customer.customerName}
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      <span style={{
-                        fontSize: '0.8rem',
-                        padding: '0.15rem 0.5rem',
-                        borderRadius: '4px',
-                        background: pmt.paymentMethod === 'Cash' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                        color: pmt.paymentMethod === 'Cash' ? 'var(--success)' : 'var(--warning)'
-                      }}>
-                        {pmt.paymentMethod}
+        <>
+          {/* Mobile Card View */}
+          <div className="tbl-mobile">
+            {(() => {
+              const paginatedPayments = filteredPayments.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+              return paginatedPayments.map((pmt) => (
+                <div key={pmt.id} className="gen-mobile-card" onClick={() => router.push(`/invoices/${pmt.invoice.id}`)}>
+                  <div className="gen-mobile-card-header">
+                    <span className="gen-mobile-card-title">{pmt.invoice.invoiceNumber}</span>
+                    <span style={{
+                      background: pmt.status === 'Collected' ? 'rgba(16, 185, 129, 0.2)' : pmt.status === 'Deposited' ? 'rgba(59, 130, 246, 0.2)' : pmt.status === 'Bounced' || pmt.status === 'Void' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+                      color: pmt.status === 'Collected' ? 'var(--success)' : pmt.status === 'Deposited' ? '#60a5fa' : pmt.status === 'Bounced' || pmt.status === 'Void' ? 'var(--danger)' : 'var(--warning)',
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: '9999px',
+                      fontSize: '0.75rem',
+                      fontWeight: '600'
+                    }}>
+                      {pmt.status}
+                    </span>
+                  </div>
+                  <div className="gen-mobile-card-body">
+                    <div className="gen-mobile-card-row">
+                      <span className="gen-mobile-card-label">Customer</span>
+                      <span
+                        className="gen-mobile-card-value"
+                        style={{ cursor: 'pointer', textDecoration: 'underline', color: 'var(--accent-hover)' }}
+                        onClick={(e) => { e.stopPropagation(); router.push(`/customers/${pmt.invoice.customer.id}`); }}
+                      >
+                        {pmt.invoice.customer.customerName}
                       </span>
-                    </td>
-                    <td style={{ padding: '1rem', fontWeight: '600' }}>
-                      ${pmt.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </td>
-                    <td 
-                      style={{ 
-                        padding: '1rem', 
-                        color: pmt.paymentMethod === 'Cheque' ? 'var(--accent-hover)' : 'var(--text-muted)',
-                        cursor: pmt.paymentMethod === 'Cheque' ? 'pointer' : 'default',
-                        textDecoration: pmt.paymentMethod === 'Cheque' ? 'underline' : 'none'
-                      }}
-                      title={pmt.paymentMethod === 'Cheque' ? "Click to view bank transactions" : ""}
-                      onClick={(e) => {
-                        if (pmt.paymentMethod === 'Cheque' && pmt.bank) {
-                          e.stopPropagation();
-                          const bId = banks.find(b => b.bankName.toLowerCase() === pmt.bank?.toLowerCase())?.id;
-                          if (bId) {
-                            router.push(`/banks/${bId}`);
-                          } else {
-                            router.push('/banks');
+                    </div>
+                    <div className="gen-mobile-card-row">
+                      <span className="gen-mobile-card-label">Method</span>
+                      <span className="gen-mobile-card-value">
+                        <span style={{
+                          fontSize: '0.8rem',
+                          padding: '0.15rem 0.5rem',
+                          borderRadius: '4px',
+                          background: pmt.paymentMethod === 'Cash' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                          color: pmt.paymentMethod === 'Cash' ? 'var(--success)' : 'var(--warning)'
+                        }}>
+                          {pmt.paymentMethod}
+                        </span>
+                      </span>
+                    </div>
+                    <div className="gen-mobile-card-row">
+                      <span className="gen-mobile-card-label">Amount</span>
+                      <span className="gen-mobile-card-value" style={{ fontWeight: '600' }}>
+                        ${pmt.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="gen-mobile-card-row">
+                      <span className="gen-mobile-card-label">Bank / Slip</span>
+                      <span
+                        className="gen-mobile-card-value"
+                        style={{
+                          color: pmt.paymentMethod === 'Cheque' ? 'var(--accent-hover)' : 'var(--text-muted)',
+                          cursor: pmt.paymentMethod === 'Cheque' ? 'pointer' : 'default',
+                          textDecoration: pmt.paymentMethod === 'Cheque' ? 'underline' : 'none'
+                        }}
+                        onClick={(e) => {
+                          if (pmt.paymentMethod === 'Cheque' && pmt.bank) {
+                            e.stopPropagation();
+                            const bId = banks.find(b => b.bankName.toLowerCase() === pmt.bank?.toLowerCase())?.id;
+                            if (bId) { router.push(`/banks/${bId}`); } else { router.push('/banks'); }
                           }
-                        }
-                      }}
-                    >
-                      {pmt.paymentMethod === 'Cheque' ? pmt.bank : pmt.slipNumber || '-'}
-                    </td>
-                    <td style={{ padding: '1rem', fontFamily: 'monospace' }}>
-                      {pmt.chequeNumber || '-'}
-                    </td>
-                    <td style={{ padding: '1rem', color: pmt.paymentMethod === 'Cheque' ? 'var(--warning)' : 'var(--text-muted)' }}>
-                      {pmt.dueDate ? new Date(pmt.dueDate).toLocaleDateString() : '-'}
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      <span style={{
-                        background: pmt.status === 'Collected' ? 'rgba(16, 185, 129, 0.2)' : pmt.status === 'Deposited' ? 'rgba(59, 130, 246, 0.2)' : pmt.status === 'Bounced' || pmt.status === 'Void' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                        color: pmt.status === 'Collected' ? 'var(--success)' : pmt.status === 'Deposited' ? '#60a5fa' : pmt.status === 'Bounced' || pmt.status === 'Void' ? 'var(--danger)' : 'var(--warning)',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '9999px',
-                        fontSize: '0.75rem',
-                        fontWeight: '600'
-                      }}>
-                        {pmt.status}
+                        }}
+                      >
+                        {pmt.paymentMethod === 'Cheque' ? pmt.bank : pmt.slipNumber || '-'}
                       </span>
-                    </td>
-                    <td style={{ padding: '0.5rem 1rem', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
-                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', alignItems: 'center' }}>
-                        {pmt.status === 'Uncollected' && pmt.paymentMethod === 'Cheque' && canManagePayments && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeposit(pmt.id, pmt.dueDate ?? undefined); }}
-                              style={{
-                                background: 'rgba(59, 130, 246, 0.1)',
-                                border: '1px solid rgba(59, 130, 246, 0.3)',
-                                color: '#60a5fa',
-                                padding: '0.25rem 0.6rem',
-                                borderRadius: '6px',
-                                fontSize: '0.75rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                fontWeight: '600'
-                              }}
-                              onMouseOver={(e) => {
-                                e.currentTarget.style.background = '#3b82f6';
-                                e.currentTarget.style.color = '#fff';
-                              }}
-                              onMouseOut={(e) => {
-                                e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)';
-                                e.currentTarget.style.color = '#60a5fa';
-                              }}
-                            >
-                              Deposit
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id, pmt.dueDate ?? undefined); }}
-                              style={{
-                                background: 'rgba(245, 158, 11, 0.1)',
-                                border: '1px solid rgba(245, 158, 11, 0.3)',
-                                color: 'var(--warning)',
-                                padding: '0.25rem 0.6rem',
-                                borderRadius: '6px',
-                                fontSize: '0.75rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                fontWeight: '600'
-                              }}
-                              onMouseOver={(e) => {
-                                e.currentTarget.style.background = 'var(--warning)';
-                                e.currentTarget.style.color = '#fff';
-                              }}
-                              onMouseOut={(e) => {
-                                e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
-                                e.currentTarget.style.color = 'var(--warning)';
-                              }}
-                            >
-                              Bounce
-                            </button>
-                          </>
-                        )}
-                        {pmt.status === 'Deposited' && pmt.paymentMethod === 'Cheque' && canManagePayments && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleClearCheque(pmt.id, pmt.dueDate ?? undefined); }}
-                              style={{
-                                background: 'rgba(16, 185, 129, 0.1)',
-                                border: '1px solid rgba(16, 185, 129, 0.3)',
-                                color: 'var(--success)',
-                                padding: '0.25rem 0.6rem',
-                                borderRadius: '6px',
-                                fontSize: '0.75rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                fontWeight: '600'
-                              }}
-                              onMouseOver={(e) => {
-                                e.currentTarget.style.background = 'var(--success)';
-                                e.currentTarget.style.color = '#fff';
-                              }}
-                              onMouseOut={(e) => {
-                                e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)';
-                                e.currentTarget.style.color = 'var(--success)';
-                              }}
-                            >
-                              Clear
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id, pmt.dueDate ?? undefined); }}
-                              style={{
-                                background: 'rgba(245, 158, 11, 0.1)',
-                                border: '1px solid rgba(245, 158, 11, 0.3)',
-                                color: 'var(--warning)',
-                                padding: '0.25rem 0.6rem',
-                                borderRadius: '6px',
-                                fontSize: '0.75rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                fontWeight: '600'
-                              }}
-                              onMouseOver={(e) => {
-                                e.currentTarget.style.background = 'var(--warning)';
-                                e.currentTarget.style.color = '#fff';
-                              }}
-                              onMouseOut={(e) => {
-                                e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
-                                e.currentTarget.style.color = 'var(--warning)';
-                              }}
-                            >
-                              Bounce
-                            </button>
-                          </>
-                        )}
-                        {pmt.status !== 'Void' && canManagePayments && (
-                          <button
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleVoidPayment(pmt.id); }}
-                            style={{
-                              background: 'rgba(239, 68, 68, 0.1)',
-                              border: '1px solid rgba(239, 68, 68, 0.3)',
-                              color: 'var(--danger)',
-                              padding: '0.25rem 0.6rem',
-                              borderRadius: '6px',
-                              fontSize: '0.75rem',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s',
-                              fontWeight: '600'
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.background = 'var(--danger)';
-                              e.currentTarget.style.color = '#fff';
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
-                              e.currentTarget.style.color = 'var(--danger)';
-                            }}
-                          >
-                            Void
-                          </button>
-                        )}
-                        {pmt.status === 'Void' && (
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic' }}>No Actions</span>
-                        )}
-                      </div>
-                    </td>
+                    </div>
+                    <div className="gen-mobile-card-row">
+                      <span className="gen-mobile-card-label">Cheque #</span>
+                      <span className="gen-mobile-card-value" style={{ fontFamily: 'monospace' }}>
+                        {pmt.chequeNumber || '-'}
+                      </span>
+                    </div>
+                    <div className="gen-mobile-card-row">
+                      <span className="gen-mobile-card-label">Maturity Date</span>
+                      <span className="gen-mobile-card-value" style={{ color: pmt.paymentMethod === 'Cheque' ? 'var(--warning)' : 'var(--text-muted)' }}>
+                        {pmt.dueDate ? new Date(pmt.dueDate).toLocaleDateString() : '-'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="gen-mobile-card-actions" onClick={(e) => e.stopPropagation()}>
+                    {pmt.status === 'Uncollected' && pmt.paymentMethod === 'Cheque' && canManagePayments && (
+                      <>
+                        <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeposit(pmt.id, pmt.dueDate ?? undefined); }}>
+                          Deposit
+                        </button>
+                        <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id, pmt.dueDate ?? undefined); }}>
+                          Bounce
+                        </button>
+                      </>
+                    )}
+                    {pmt.status === 'Deposited' && pmt.paymentMethod === 'Cheque' && canManagePayments && (
+                      <>
+                        <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleClearCheque(pmt.id, pmt.dueDate ?? undefined); }}>
+                          Clear
+                        </button>
+                        <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id, pmt.dueDate ?? undefined); }}>
+                          Bounce
+                        </button>
+                      </>
+                    )}
+                    {pmt.status !== 'Void' && canManagePayments && (
+                      <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleVoidPayment(pmt.id); }}>
+                        Void
+                      </button>
+                    )}
+                    {pmt.status === 'Void' && (
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic' }}>No Actions</span>
+                    )}
+                  </div>
+                </div>
+              ));
+            })()}
+            {/* Mobile Pagination */}
+            {(() => {
+              const totalPages = Math.max(1, Math.ceil(filteredPayments.length / rowsPerPage));
+              return (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
+                  <button className="btn-secondary" disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+                    Prev
+                  </button>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button className="btn-secondary" disabled={currentPage >= totalPages}
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+                    Next
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="tbl-desktop">
+            <div className="glass-panel" style={{ padding: '1rem', overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                    <th style={{ padding: '1rem' }}>Invoice No.</th>
+                    <th style={{ padding: '1rem' }}>Customer</th>
+                    <th style={{ padding: '1rem' }}>Method</th>
+                    <th style={{ padding: '1rem' }}>Amount</th>
+                    <th style={{ padding: '1rem' }}>Bank / Slip</th>
+                    <th style={{ padding: '1rem' }}>Cheque Number</th>
+                    <th style={{ padding: '1rem' }}>Maturity Date</th>
+                    <th style={{ padding: '1rem' }}>Status</th>
+                    <th style={{ padding: '1rem', textAlign: 'center' }}>Actions</th>
                   </tr>
-                ));
+                </thead>
+                <tbody>
+                  {(() => {
+                    const paginatedPayments = filteredPayments.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+                    return paginatedPayments.map((pmt) => (
+                      <tr
+                        key={pmt.id}
+                        style={{
+                          borderBottom: '1px solid var(--border-color)',
+                          fontSize: '0.95rem',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s'
+                        }}
+                        onClick={() => router.push(`/invoices/${pmt.invoice.id}`)}
+                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--accent-hover)' }}>{pmt.invoice.invoiceNumber}</td>
+                        <td 
+                          style={{ padding: '1rem', fontWeight: '500', cursor: 'pointer', textDecoration: 'underline', color: 'var(--accent-hover)' }}
+                          title="Click to view customer dashboard"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/customers/${pmt.invoice.customer.id}`);
+                          }}
+                        >
+                          {pmt.invoice.customer.customerName}
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          <span style={{
+                            fontSize: '0.8rem',
+                            padding: '0.15rem 0.5rem',
+                            borderRadius: '4px',
+                            background: pmt.paymentMethod === 'Cash' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                            color: pmt.paymentMethod === 'Cash' ? 'var(--success)' : 'var(--warning)'
+                          }}>
+                            {pmt.paymentMethod}
+                          </span>
+                        </td>
+                        <td style={{ padding: '1rem', fontWeight: '600' }}>
+                          ${pmt.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </td>
+                        <td 
+                          style={{ 
+                            padding: '1rem', 
+                            color: pmt.paymentMethod === 'Cheque' ? 'var(--accent-hover)' : 'var(--text-muted)',
+                            cursor: pmt.paymentMethod === 'Cheque' ? 'pointer' : 'default',
+                            textDecoration: pmt.paymentMethod === 'Cheque' ? 'underline' : 'none'
+                          }}
+                          title={pmt.paymentMethod === 'Cheque' ? "Click to view bank transactions" : ""}
+                          onClick={(e) => {
+                            if (pmt.paymentMethod === 'Cheque' && pmt.bank) {
+                              e.stopPropagation();
+                              const bId = banks.find(b => b.bankName.toLowerCase() === pmt.bank?.toLowerCase())?.id;
+                              if (bId) {
+                                router.push(`/banks/${bId}`);
+                              } else {
+                                router.push('/banks');
+                              }
+                            }
+                          }}
+                        >
+                          {pmt.paymentMethod === 'Cheque' ? pmt.bank : pmt.slipNumber || '-'}
+                        </td>
+                        <td style={{ padding: '1rem', fontFamily: 'monospace' }}>
+                          {pmt.chequeNumber || '-'}
+                        </td>
+                        <td style={{ padding: '1rem', color: pmt.paymentMethod === 'Cheque' ? 'var(--warning)' : 'var(--text-muted)' }}>
+                          {pmt.dueDate ? new Date(pmt.dueDate).toLocaleDateString() : '-'}
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          <span style={{
+                            background: pmt.status === 'Collected' ? 'rgba(16, 185, 129, 0.2)' : pmt.status === 'Deposited' ? 'rgba(59, 130, 246, 0.2)' : pmt.status === 'Bounced' || pmt.status === 'Void' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+                            color: pmt.status === 'Collected' ? 'var(--success)' : pmt.status === 'Deposited' ? '#60a5fa' : pmt.status === 'Bounced' || pmt.status === 'Void' ? 'var(--danger)' : 'var(--warning)',
+                            padding: '0.25rem 0.75rem',
+                            borderRadius: '9999px',
+                            fontSize: '0.75rem',
+                            fontWeight: '600'
+                          }}>
+                            {pmt.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.5rem 1rem', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', alignItems: 'center' }}>
+                            {pmt.status === 'Uncollected' && pmt.paymentMethod === 'Cheque' && canManagePayments && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeposit(pmt.id, pmt.dueDate ?? undefined); }}
+                                  style={{
+                                    background: 'rgba(59, 130, 246, 0.1)',
+                                    border: '1px solid rgba(59, 130, 246, 0.3)',
+                                    color: '#60a5fa',
+                                    padding: '0.25rem 0.6rem',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    fontWeight: '600'
+                                  }}
+                                  onMouseOver={(e) => {
+                                    e.currentTarget.style.background = '#3b82f6';
+                                    e.currentTarget.style.color = '#fff';
+                                  }}
+                                  onMouseOut={(e) => {
+                                    e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)';
+                                    e.currentTarget.style.color = '#60a5fa';
+                                  }}
+                                >
+                                  Deposit
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id, pmt.dueDate ?? undefined); }}
+                                  style={{
+                                    background: 'rgba(245, 158, 11, 0.1)',
+                                    border: '1px solid rgba(245, 158, 11, 0.3)',
+                                    color: 'var(--warning)',
+                                    padding: '0.25rem 0.6rem',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    fontWeight: '600'
+                                  }}
+                                  onMouseOver={(e) => {
+                                    e.currentTarget.style.background = 'var(--warning)';
+                                    e.currentTarget.style.color = '#fff';
+                                  }}
+                                  onMouseOut={(e) => {
+                                    e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
+                                    e.currentTarget.style.color = 'var(--warning)';
+                                  }}
+                                >
+                                  Bounce
+                                </button>
+                              </>
+                            )}
+                            {pmt.status === 'Deposited' && pmt.paymentMethod === 'Cheque' && canManagePayments && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleClearCheque(pmt.id, pmt.dueDate ?? undefined); }}
+                                  style={{
+                                    background: 'rgba(16, 185, 129, 0.1)',
+                                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                                    color: 'var(--success)',
+                                    padding: '0.25rem 0.6rem',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    fontWeight: '600'
+                                  }}
+                                  onMouseOver={(e) => {
+                                    e.currentTarget.style.background = 'var(--success)';
+                                    e.currentTarget.style.color = '#fff';
+                                  }}
+                                  onMouseOut={(e) => {
+                                    e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)';
+                                    e.currentTarget.style.color = 'var(--success)';
+                                  }}
+                                >
+                                  Clear
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBounceCheque(pmt.id, pmt.dueDate ?? undefined); }}
+                                  style={{
+                                    background: 'rgba(245, 158, 11, 0.1)',
+                                    border: '1px solid rgba(245, 158, 11, 0.3)',
+                                    color: 'var(--warning)',
+                                    padding: '0.25rem 0.6rem',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    fontWeight: '600'
+                                  }}
+                                  onMouseOver={(e) => {
+                                    e.currentTarget.style.background = 'var(--warning)';
+                                    e.currentTarget.style.color = '#fff';
+                                  }}
+                                  onMouseOut={(e) => {
+                                    e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
+                                    e.currentTarget.style.color = 'var(--warning)';
+                                  }}
+                                >
+                                  Bounce
+                                </button>
+                              </>
+                            )}
+                            {pmt.status !== 'Void' && canManagePayments && (
+                              <button
+                                type="button"
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleVoidPayment(pmt.id); }}
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.1)',
+                                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                                  color: 'var(--danger)',
+                                  padding: '0.25rem 0.6rem',
+                                  borderRadius: '6px',
+                                  fontSize: '0.75rem',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s',
+                                  fontWeight: '600'
+                                }}
+                                onMouseOver={(e) => {
+                                  e.currentTarget.style.background = 'var(--danger)';
+                                  e.currentTarget.style.color = '#fff';
+                                }}
+                                onMouseOut={(e) => {
+                                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                                  e.currentTarget.style.color = 'var(--danger)';
+                                }}
+                              >
+                                Void
+                              </button>
+                            )}
+                            {pmt.status === 'Void' && (
+                              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic' }}>No Actions</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ));
+                  })()}
+                </tbody>
+              </table>
+              
+              {/* Pagination Controls */}
+              {(() => {
+                const totalPages = Math.max(1, Math.ceil(filteredPayments.length / rowsPerPage));
+                return (
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
+                    <button 
+                      className="btn-secondary" 
+                      disabled={currentPage === 1} 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                    >
+                      Prev
+                    </button>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button 
+                      className="btn-secondary" 
+                      disabled={currentPage >= totalPages} 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                );
               })()}
-            </tbody>
-          </table>
-          
-          {/* Pagination Controls */}
-          {(() => {
-            const totalPages = Math.max(1, Math.ceil(filteredPayments.length / rowsPerPage));
-            return (
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
-                <button 
-                  className="btn-secondary" 
-                  disabled={currentPage === 1} 
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
-                >
-                  Prev
-                </button>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button 
-                  className="btn-secondary" 
-                  disabled={currentPage >= totalPages} 
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
-                >
-                  Next
-                </button>
-              </div>
-            );
-          })()}
-        </div>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Bounce Cheque Reason Modal */}

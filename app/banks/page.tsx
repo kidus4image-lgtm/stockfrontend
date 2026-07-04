@@ -165,7 +165,7 @@ export default function BanksPage() {
 
   return (
     <div className="dashboard-container" style={{ height: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexShrink: 0, flexWrap: 'wrap', gap: '1rem' }}>
+      <header className="page-header gen-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexShrink: 0, flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 className="text-gradient" style={{ fontSize: '2.2rem', margin: 0, fontWeight: 800 }}>Corporate Banks</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.15rem' }}>
@@ -206,63 +206,115 @@ export default function BanksPage() {
               />
             </div>
             
-            <div className="table-wrap" style={{ flex: 1, overflowY: 'auto', marginBottom: '1rem' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Bank</th>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Branch</th>
-                    <th style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>Total Deposits</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(() => {
-                    const filteredBanks = banks.filter((b) => {
-                      const s = searchQuery.trim().toLowerCase();
-                      if (!s) return true;
-                      return (
-                        b.bankName.toLowerCase().includes(s) ||
-                        (b.branchName || '').toLowerCase().includes(s) ||
-                        b.accountNumber.toLowerCase().includes(s)
-                      );
-                    });
-                    const paginatedBanks = filteredBanks.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                    return paginatedBanks.map((bank) => (
-                      <tr
-                        key={bank.id}
-                        style={{
-                          borderBottom: '1px solid var(--border-color)',
-                          fontSize: '0.9rem',
-                          cursor: 'pointer',
-                          background: selectedBank?.id === bank.id ? 'rgba(23, 79, 73, 0.12)' : 'transparent',
-                          transition: 'background 0.2s'
+            {/* Mobile bank cards */}
+            <div className="tbl-mobile" style={{ flex: 1, overflowY: 'auto', marginBottom: '1rem' }}>
+              {(() => {
+                const filteredBanks = banks.filter((b) => {
+                  const s = searchQuery.trim().toLowerCase();
+                  if (!s) return true;
+                  return (
+                    b.bankName.toLowerCase().includes(s) ||
+                    (b.branchName || '').toLowerCase().includes(s) ||
+                    b.accountNumber.toLowerCase().includes(s)
+                  );
+                });
+                const paginatedBanks = filteredBanks.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+                return paginatedBanks.map((bank) => (
+                  <div
+                    key={bank.id}
+                    className="gen-mobile-card"
+                    style={{ cursor: 'pointer', background: selectedBank?.id === bank.id ? 'rgba(23, 79, 73, 0.12)' : undefined }}
+                    onClick={() => handleSelectBank(bank)}
+                  >
+                    <div className="gen-mobile-card-header">
+                      <span
+                        className="gen-mobile-card-title"
+                        style={{ color: 'var(--accent-hover)', cursor: 'pointer', textDecoration: 'underline' }}
+                        title="Click to view bank dashboard"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/banks/${bank.id}`);
                         }}
-                        onClick={() => handleSelectBank(bank)}
                       >
-                        <td 
-                          style={{ padding: '0.75rem 0.5rem', fontWeight: '600', color: 'var(--accent-hover)', cursor: 'pointer', textDecoration: 'underline' }}
-                          title="Click to view bank dashboard"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/banks/${bank.id}`);
+                        {bank.bankName}
+                      </span>
+                    </div>
+                    <div className="gen-mobile-card-body">
+                      <span className="gen-mobile-card-label">Branch</span>
+                      <span className="gen-mobile-card-value">{bank.branchName || 'Head Office'}</span>
+                      <span className="gen-mobile-card-label">Total Deposits</span>
+                      <span className="gen-mobile-card-value" style={{ color: 'var(--success)' }}>
+                        ${bankTransactions
+                          .filter((t) => t.bank === bank.bankName)
+                          .reduce((s, t) => s + t.amount, 0)
+                          .toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+
+            {/* Desktop bank table */}
+            <div className="tbl-desktop" style={{ flex: 1, overflowY: 'auto', marginBottom: '1rem' }}>
+              <div className="table-wrap" style={{ height: '100%' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                      <th style={{ padding: '0.75rem 0.5rem' }}>Bank</th>
+                      <th style={{ padding: '0.75rem 0.5rem' }}>Branch</th>
+                      <th style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>Total Deposits</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      const filteredBanks = banks.filter((b) => {
+                        const s = searchQuery.trim().toLowerCase();
+                        if (!s) return true;
+                        return (
+                          b.bankName.toLowerCase().includes(s) ||
+                          (b.branchName || '').toLowerCase().includes(s) ||
+                          b.accountNumber.toLowerCase().includes(s)
+                        );
+                      });
+                      const paginatedBanks = filteredBanks.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+                      return paginatedBanks.map((bank) => (
+                        <tr
+                          key={bank.id}
+                          style={{
+                            borderBottom: '1px solid var(--border-color)',
+                            fontSize: '0.9rem',
+                            cursor: 'pointer',
+                            background: selectedBank?.id === bank.id ? 'rgba(23, 79, 73, 0.12)' : 'transparent',
+                            transition: 'background 0.2s'
                           }}
+                          onClick={() => handleSelectBank(bank)}
                         >
-                          {bank.bankName}
-                        </td>
-                        <td style={{ padding: '0.75rem 0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                          {bank.branchName || 'Head Office'}
-                        </td>
-                        <td style={{ padding: '0.75rem 0.5rem', color: 'var(--success)', fontWeight: '600', textAlign: 'right', fontSize: '0.85rem' }}>
-                          ${bankTransactions
-                            .filter((t) => t.bank === bank.bankName)
-                            .reduce((s, t) => s + t.amount, 0)
-                            .toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                      </tr>
-                    ));
-                  })()}
-                </tbody>
-              </table>
+                          <td 
+                            style={{ padding: '0.75rem 0.5rem', fontWeight: '600', color: 'var(--accent-hover)', cursor: 'pointer', textDecoration: 'underline' }}
+                            title="Click to view bank dashboard"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/banks/${bank.id}`);
+                            }}
+                          >
+                            {bank.bankName}
+                          </td>
+                          <td style={{ padding: '0.75rem 0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                            {bank.branchName || 'Head Office'}
+                          </td>
+                          <td style={{ padding: '0.75rem 0.5rem', color: 'var(--success)', fontWeight: '600', textAlign: 'right', fontSize: '0.85rem' }}>
+                            ${bankTransactions
+                              .filter((t) => t.bank === bank.bankName)
+                              .reduce((s, t) => s + t.amount, 0)
+                              .toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          </td>
+                        </tr>
+                      ));
+                    })()}
+                  </tbody>
+                </table>
+              </div>
             </div>
             
             {/* Pagination Controls */}
@@ -351,7 +403,7 @@ export default function BanksPage() {
               </div>
 
               {/* Filter Row */}
-              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.75rem', flexWrap: 'wrap', flexShrink: 0 }}>
+              <div className="gen-page-filters" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.75rem', flexWrap: 'wrap', flexShrink: 0 }}>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Filter:</span>
 
                 <select className="form-control" value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} style={{ width: 'auto', padding: '0.35rem 0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', border: '1px solid var(--border-color)', fontSize: '0.8rem' }}>
@@ -504,36 +556,75 @@ export default function BanksPage() {
                   ) : ledger.length === 0 ? (
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>No ledger entries yet.</p>
                   ) : (
-                    <div style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
-                        <thead>
-                          <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                            {['Date', 'Type', 'Description', 'Debit', 'Credit'].map(h => (
-                              <th key={h} style={{ padding: '0.4rem 0.75rem', textAlign: h === 'Debit' || h === 'Credit' ? 'right' : 'left', color: 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {ledger.map(entry => (
-                            <tr key={entry.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                              <td style={{ padding: '0.4rem 0.75rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{new Date(entry.date).toLocaleDateString()}</td>
-                              <td style={{ padding: '0.4rem 0.75rem' }}>
-                                <span style={{ padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600, background: entry.debit > 0 ? 'rgba(244,63,94,0.1)' : 'rgba(16,185,129,0.1)', color: entry.debit > 0 ? 'var(--danger)' : 'var(--success)' }}>
-                                  {entry.type.replace(/_/g, ' ')}
-                                </span>
-                              </td>
-                              <td style={{ padding: '0.4rem 0.75rem', color: 'var(--text-main)' }}>{entry.description}</td>
-                              <td style={{ padding: '0.4rem 0.75rem', textAlign: 'right', color: entry.debit > 0 ? 'var(--danger)' : 'var(--text-muted)' }}>
+                    <>
+                      {/* Mobile ledger cards */}
+                      <div className="tbl-mobile">
+                        {ledger.map(entry => (
+                          <div key={entry.id} className="gen-mobile-card">
+                            <div className="gen-mobile-card-header">
+                              <span className="gen-mobile-card-title">
+                                {new Date(entry.date).toLocaleDateString()}
+                              </span>
+                              <span style={{
+                                padding: '0.15rem 0.4rem',
+                                borderRadius: '4px',
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                background: entry.debit > 0 ? 'rgba(244,63,94,0.1)' : 'rgba(16,185,129,0.1)',
+                                color: entry.debit > 0 ? 'var(--danger)' : 'var(--success)'
+                              }}>
+                                {entry.type.replace(/_/g, ' ')}
+                              </span>
+                            </div>
+                            <div className="gen-mobile-card-body">
+                              <span className="gen-mobile-card-label">Description</span>
+                              <span className="gen-mobile-card-value">{entry.description}</span>
+                              <span className="gen-mobile-card-label">Debit</span>
+                              <span className="gen-mobile-card-value" style={{ color: entry.debit > 0 ? 'var(--danger)' : 'var(--text-muted)' }}>
                                 {entry.debit > 0 ? entry.debit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
-                              </td>
-                              <td style={{ padding: '0.4rem 0.75rem', textAlign: 'right', color: entry.credit > 0 ? 'var(--success)' : 'var(--text-muted)' }}>
+                              </span>
+                              <span className="gen-mobile-card-label">Credit</span>
+                              <span className="gen-mobile-card-value" style={{ color: entry.credit > 0 ? 'var(--success)' : 'var(--text-muted)' }}>
                                 {entry.credit > 0 ? entry.credit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {/* Desktop ledger table */}
+                      <div className="tbl-desktop">
+                        <div style={{ overflowX: 'auto' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+                            <thead>
+                              <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                {['Date', 'Type', 'Description', 'Debit', 'Credit'].map(h => (
+                                  <th key={h} style={{ padding: '0.4rem 0.75rem', textAlign: h === 'Debit' || h === 'Credit' ? 'right' : 'left', color: 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {ledger.map(entry => (
+                                <tr key={entry.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                                  <td style={{ padding: '0.4rem 0.75rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{new Date(entry.date).toLocaleDateString()}</td>
+                                  <td style={{ padding: '0.4rem 0.75rem' }}>
+                                    <span style={{ padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600, background: entry.debit > 0 ? 'rgba(244,63,94,0.1)' : 'rgba(16,185,129,0.1)', color: entry.debit > 0 ? 'var(--danger)' : 'var(--success)' }}>
+                                      {entry.type.replace(/_/g, ' ')}
+                                    </span>
+                                  </td>
+                                  <td style={{ padding: '0.4rem 0.75rem', color: 'var(--text-main)' }}>{entry.description}</td>
+                                  <td style={{ padding: '0.4rem 0.75rem', textAlign: 'right', color: entry.debit > 0 ? 'var(--danger)' : 'var(--text-muted)' }}>
+                                    {entry.debit > 0 ? entry.debit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
+                                  </td>
+                                  <td style={{ padding: '0.4rem 0.75rem', textAlign: 'right', color: entry.credit > 0 ? 'var(--success)' : 'var(--text-muted)' }}>
+                                    {entry.credit > 0 ? entry.credit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </>
                   )}
                 </div>
               )}

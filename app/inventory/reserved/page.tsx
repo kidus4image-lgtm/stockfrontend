@@ -73,7 +73,7 @@ export default function ReservedStockPage() {
 
   return (
     <div className="dashboard-container">
-      <header className="page-header">
+      <header className="page-header gen-page-header">
         <div>
           <h1 className="text-gradient">Reserved Stock Report</h1>
           <p style={{ color: 'var(--text-muted)' }}>
@@ -106,46 +106,87 @@ export default function ReservedStockPage() {
         </div>
       ) : (
         <div className="glass-panel" style={{ padding: '1.25rem' }}>
-          <div className="table-wrap">
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                  <th style={{ padding: '0.75rem' }}>Product</th>
-                  <th style={{ padding: '0.75rem' }}>Batch</th>
-                  <th style={{ padding: '0.75rem', textAlign: 'right' }}>Reserved</th>
-                  <th style={{ padding: '0.75rem' }}>Order #</th>
-                  <th style={{ padding: '0.75rem' }}>Status</th>
-                  <th style={{ padding: '0.75rem' }}>Customer</th>
-                  <th style={{ padding: '0.75rem' }}>Sales Rep</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map((item) => (
-                  <tr key={item.id} className="table-row-hover" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', fontSize: '0.85rem' }}>
-                    <td style={{ padding: '0.75rem', fontWeight: 600 }}>
-                      <span style={{ cursor: 'pointer', color: 'var(--accent-hover)', textDecoration: 'underline' }}
-                        onClick={() => router.push(`/inventory/${item.productId}`)}>
-                        {item.productName}
-                      </span>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginLeft: '0.5rem' }}>{item.productSku}</span>
-                    </td>
-                    <td style={{ padding: '0.75rem', color: 'var(--text-muted)' }}>{item.batchNumber}</td>
-                    <td style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 600, color: '#f59e0b' }}>{item.reservedQuantity}</td>
-                    <td style={{ padding: '0.75rem' }}>
-                      <span style={{ cursor: 'pointer', color: 'var(--accent-hover)', textDecoration: 'underline' }}
-                        onClick={() => router.push(`/orders/${item.orderId}`)}>
-                        {item.orderNumber}
-                      </span>
-                    </td>
-                    <td style={{ padding: '0.75rem' }}>
-                      <span style={{ ...statusStyle(item.orderStatus), fontWeight: 600 }}>{item.orderStatus}</span>
-                    </td>
-                    <td style={{ padding: '0.75rem', color: 'var(--text-main)' }}>{item.customerName}</td>
-                    <td style={{ padding: '0.75rem', color: 'var(--text-muted)' }}>{item.salesRepName || '-'}</td>
+          <div className="tbl-mobile">
+            {paginated.map((item) => (
+              <div key={item.id} className="gen-mobile-card">
+                <div className="gen-mobile-card-header">
+                  <span className="gen-mobile-card-title" style={{ cursor: 'pointer', color: 'var(--accent-hover)', textDecoration: 'underline' }}
+                    onClick={() => router.push(`/inventory/${item.productId}`)}>
+                    {item.productName}
+                  </span>
+                  <span style={{ ...statusStyle(item.orderStatus), fontWeight: 600, fontSize: '0.8rem' }}>{item.orderStatus}</span>
+                </div>
+                <div className="gen-mobile-card-body">
+                  <div>
+                    <div className="gen-mobile-card-label">Batch</div>
+                    <div className="gen-mobile-card-value">{item.batchNumber}</div>
+                  </div>
+                  <div>
+                    <div className="gen-mobile-card-label">Reserved</div>
+                    <div className="gen-mobile-card-value" style={{ color: '#f59e0b' }}>{item.reservedQuantity}</div>
+                  </div>
+                  <div>
+                    <div className="gen-mobile-card-label">Order</div>
+                    <div className="gen-mobile-card-value" style={{ cursor: 'pointer', color: 'var(--accent-hover)', textDecoration: 'underline' }}
+                      onClick={() => router.push(`/orders/${item.orderId}`)}>
+                      {item.orderNumber}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="gen-mobile-card-label">Customer</div>
+                    <div className="gen-mobile-card-value">{item.customerName}</div>
+                  </div>
+                </div>
+                {item.salesRepName && (
+                  <div className="gen-mobile-card-actions">
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Sales Rep: {item.salesRepName}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="tbl-desktop">
+            <div className="table-wrap">
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    <th style={{ padding: '0.75rem' }}>Product</th>
+                    <th style={{ padding: '0.75rem' }}>Batch</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'right' }}>Reserved</th>
+                    <th style={{ padding: '0.75rem' }}>Order #</th>
+                    <th style={{ padding: '0.75rem' }}>Status</th>
+                    <th style={{ padding: '0.75rem' }}>Customer</th>
+                    <th style={{ padding: '0.75rem' }}>Sales Rep</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {paginated.map((item) => (
+                    <tr key={item.id} className="table-row-hover" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', fontSize: '0.85rem' }}>
+                      <td style={{ padding: '0.75rem', fontWeight: 600 }}>
+                        <span style={{ cursor: 'pointer', color: 'var(--accent-hover)', textDecoration: 'underline' }}
+                          onClick={() => router.push(`/inventory/${item.productId}`)}>
+                          {item.productName}
+                        </span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginLeft: '0.5rem' }}>{item.productSku}</span>
+                      </td>
+                      <td style={{ padding: '0.75rem', color: 'var(--text-muted)' }}>{item.batchNumber}</td>
+                      <td style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 600, color: '#f59e0b' }}>{item.reservedQuantity}</td>
+                      <td style={{ padding: '0.75rem' }}>
+                        <span style={{ cursor: 'pointer', color: 'var(--accent-hover)', textDecoration: 'underline' }}
+                          onClick={() => router.push(`/orders/${item.orderId}`)}>
+                          {item.orderNumber}
+                        </span>
+                      </td>
+                      <td style={{ padding: '0.75rem' }}>
+                        <span style={{ ...statusStyle(item.orderStatus), fontWeight: 600 }}>{item.orderStatus}</span>
+                      </td>
+                      <td style={{ padding: '0.75rem', color: 'var(--text-main)' }}>{item.customerName}</td>
+                      <td style={{ padding: '0.75rem', color: 'var(--text-muted)' }}>{item.salesRepName || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
           {totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-color)' }}>

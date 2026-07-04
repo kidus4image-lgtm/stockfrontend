@@ -126,7 +126,7 @@ function EmployeesDirectory() {
 
   return (
     <div className="dashboard-container">
-      <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <header className="page-header gen-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 className="text-gradient" style={{ fontSize: '2.5rem' }}>Employee Directory</h1>
           <p style={{ color: 'var(--text-muted)' }}>Manage corporate personnel, departments, and monitor their linked customer portfolios.</p>
@@ -149,7 +149,7 @@ function EmployeesDirectory() {
           
           {/* Employee List */}
           <div className="glass-panel employee-list-panel" style={{ padding: '1rem', overflowX: 'auto', alignSelf: 'start' }}>
-            <div style={{ marginBottom: '1rem' }}>
+            <div className="gen-page-filters" style={{ marginBottom: '1rem' }}>
               <input 
                 type="text" 
                 placeholder="Search employees by name or ID..." 
@@ -159,49 +159,82 @@ function EmployeesDirectory() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                  <th style={{ padding: '1rem' }}>ID Number</th>
-                  <th style={{ padding: '1rem' }}>Employee Name</th>
-                  <th style={{ padding: '1rem' }}>Department</th>
-                  <th style={{ padding: '1rem' }}>Customers</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(() => {
-                  const filteredEmployees = employees.filter(e => 
-                    `${e.firstName} ${e.middleName} ${e.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                    e.idNumber.toLowerCase().includes(searchQuery.toLowerCase())
-                  );
-                  const paginatedEmployees = filteredEmployees.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                  return paginatedEmployees.map((emp) => (
-                    <tr
-                      key={emp.id}
-                      style={{
-                        borderBottom: '1px solid var(--border-color)',
-                        fontSize: '0.95rem',
-                        cursor: 'pointer',
-                        background: selectedEmp?.id === emp.id ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
-                        transition: 'background 0.2s'
-                      }}
-                      onClick={() => handleSelectEmployee(emp)}
-                    >
-                      <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--accent-hover)' }}>{emp.idNumber}</td>
-                      <td style={{ padding: '1rem', fontWeight: '500' }}>
-                        {emp.firstName} {emp.middleName} {emp.lastName}
-                      </td>
-                      <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{emp.department?.departmentName || '-'}</td>
-                      <td style={{ padding: '1rem', textAlign: 'center' }}>
-                        <span style={{ background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
-                          {emp.customers?.length || 0}
-                        </span>
-                      </td>
-                    </tr>
-                  ));
-                })()}
-              </tbody>
-            </table>
+            <div className="tbl-mobile">
+              {(() => {
+                const filteredEmployees = employees.filter(e => 
+                  `${e.firstName} ${e.middleName} ${e.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                  e.idNumber.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+                const paginatedEmployees = filteredEmployees.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+                return paginatedEmployees.map((emp) => (
+                  <div
+                    key={emp.id}
+                    className="gen-mobile-card"
+                    onClick={() => handleSelectEmployee(emp)}
+                  >
+                    <div className="gen-mobile-card-header">
+                      <span className="gen-mobile-card-title">{emp.firstName} {emp.middleName} {emp.lastName}</span>
+                      <span className="gen-mobile-card-label">{emp.department?.departmentName || '-'}</span>
+                    </div>
+                    <div className="gen-mobile-card-body">
+                      <div>
+                        <span className="gen-mobile-card-label">ID Number</span>
+                        <span className="gen-mobile-card-value">{emp.idNumber}</span>
+                      </div>
+                      <div>
+                        <span className="gen-mobile-card-label">Customers</span>
+                        <span className="gen-mobile-card-value">{emp.customers?.length || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+            <div className="tbl-desktop">
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                    <th style={{ padding: '1rem' }}>ID Number</th>
+                    <th style={{ padding: '1rem' }}>Employee Name</th>
+                    <th style={{ padding: '1rem' }}>Department</th>
+                    <th style={{ padding: '1rem' }}>Customers</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(() => {
+                    const filteredEmployees = employees.filter(e => 
+                      `${e.firstName} ${e.middleName} ${e.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                      e.idNumber.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                    const paginatedEmployees = filteredEmployees.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+                    return paginatedEmployees.map((emp) => (
+                      <tr
+                        key={emp.id}
+                        style={{
+                          borderBottom: '1px solid var(--border-color)',
+                          fontSize: '0.95rem',
+                          cursor: 'pointer',
+                          background: selectedEmp?.id === emp.id ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
+                          transition: 'background 0.2s'
+                        }}
+                        onClick={() => handleSelectEmployee(emp)}
+                      >
+                        <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--accent-hover)' }}>{emp.idNumber}</td>
+                        <td style={{ padding: '1rem', fontWeight: '500' }}>
+                          {emp.firstName} {emp.middleName} {emp.lastName}
+                        </td>
+                        <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{emp.department?.departmentName || '-'}</td>
+                        <td style={{ padding: '1rem', textAlign: 'center' }}>
+                          <span style={{ background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
+                            {emp.customers?.length || 0}
+                          </span>
+                        </td>
+                      </tr>
+                    ));
+                  })()}
+                </tbody>
+              </table>
+            </div>
             
             {/* Pagination Controls */}
             {(() => {

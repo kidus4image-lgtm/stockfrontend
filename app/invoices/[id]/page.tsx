@@ -749,7 +749,7 @@ export default function InvoiceDetailPage() {
           
           {/* Invoice Summary Card */}
           <div className="glass-panel" style={{ padding: '2.5rem' }}>
-            <div className="invoice-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
+            <div className="invoice-header gen-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
               <div>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Sales Invoice Header</span>
                 <h1 style={{ margin: '0.25rem 0 0.5rem 0', fontSize: '2.25rem' }} className="text-gradient">
@@ -836,7 +836,113 @@ export default function InvoiceDetailPage() {
                 No payment transactions recorded for this invoice yet.
               </p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <>
+              {/* Mobile payment cards */}
+              <div className="tbl-mobile">
+                {invoice.payments.map((pmt) => (
+                  <div className="gen-mobile-card" key={`mobile-${pmt.id}`}>
+                    <div className="gen-mobile-card-header">
+                      <span className="gen-mobile-card-title">{pmt.paymentMethod} Payment</span>
+                      <span style={{
+                        fontSize: '0.7rem',
+                        background: pmt.status === 'Collected' ? 'rgba(16, 185, 129, 0.15)' : pmt.status === 'Deposited' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                        color: pmt.status === 'Collected' ? 'var(--success)' : pmt.status === 'Deposited' ? '#60a5fa' : 'var(--warning)',
+                        padding: '0.15rem 0.5rem',
+                        borderRadius: '4px',
+                        fontWeight: 600
+                      }}>
+                        {pmt.status}
+                      </span>
+                    </div>
+                    <div className="gen-mobile-card-body">
+                      <div>
+                        <span className="gen-mobile-card-label">Amount</span>
+                        <p className="gen-mobile-card-value" style={{ color: pmt.paymentMethod === 'Cash' ? 'var(--success)' : 'var(--warning)', fontSize: '1.05rem', fontWeight: 700 }}>
+                          ${pmt.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                      {pmt.paymentMethod === 'Cheque' ? (
+                        <>
+                          <div>
+                            <span className="gen-mobile-card-label">Bank</span>
+                            <p className="gen-mobile-card-value">{pmt.bank || '—'}</p>
+                          </div>
+                          <div>
+                            <span className="gen-mobile-card-label">Cheque #</span>
+                            <p className="gen-mobile-card-value">{pmt.chequeNumber || '—'}</p>
+                          </div>
+                          {pmt.dueDate && (
+                            <div>
+                              <span className="gen-mobile-card-label">Maturity Date</span>
+                              <p className="gen-mobile-card-value" style={{ color: 'var(--warning)' }}>{new Date(pmt.dueDate).toLocaleDateString()}</p>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div>
+                          <span className="gen-mobile-card-label">Slip Reference</span>
+                          <p className="gen-mobile-card-value">{pmt.slipNumber || 'N/A'}</p>
+                        </div>
+                      )}
+                      <div>
+                        <span className="gen-mobile-card-label">Received Date</span>
+                        <p className="gen-mobile-card-value">{pmt.receivedDate ? new Date(pmt.receivedDate).toLocaleDateString() : '—'}</p>
+                      </div>
+                    </div>
+                    {canManagePayments && (
+                      <div className="gen-mobile-card-actions">
+                        {pmt.status === 'Uncollected' && (
+                          <>
+                            <button onClick={() => handleDeposit(pmt.id, pmt.dueDate ?? undefined)}
+                              className="btn-primary"
+                              style={{ padding: '0.35rem 0.6rem', fontSize: '0.75rem', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.3)' }}
+                            >🏦 Deposit</button>
+                            <button onClick={() => handleBounceCheque(pmt.id, pmt.dueDate ?? undefined)}
+                              className="btn-secondary"
+                              style={{ padding: '0.35rem 0.6rem', fontSize: '0.75rem', border: '1px solid rgba(244, 63, 94, 0.3)', color: 'var(--danger)', background: 'rgba(244, 63, 94, 0.05)' }}
+                            >🚨 Bounce</button>
+                          </>
+                        )}
+                        {pmt.status === 'Deposited' && (
+                          <>
+                            <button onClick={() => handleClearCheque(pmt.id, pmt.dueDate ?? undefined)}
+                              className="btn-primary"
+                              style={{ padding: '0.35rem 0.6rem', fontSize: '0.75rem', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--success)', border: '1px solid rgba(16, 185, 129, 0.3)' }}
+                            >💰 Clear</button>
+                            <button onClick={() => handleBounceCheque(pmt.id, pmt.dueDate ?? undefined)}
+                              className="btn-secondary"
+                              style={{ padding: '0.35rem 0.6rem', fontSize: '0.75rem', border: '1px solid rgba(244, 63, 94, 0.3)', color: 'var(--danger)', background: 'rgba(244, 63, 94, 0.05)' }}
+                            >🚨 Bounce</button>
+                          </>
+                        )}
+                        {pmt.status === 'Void' && (
+                          <>
+                            <button onClick={() => openEditPayment(pmt)}
+                              style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa', background: 'rgba(59,130,246,0.08)', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, flex: 1 }}
+                            >✏️ Edit</button>
+                            <button onClick={() => handleReactivate(pmt.id)}
+                              style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', border: '1px solid rgba(16,185,129,0.3)', color: 'var(--success)', background: 'rgba(16,185,129,0.08)', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, flex: 1 }}
+                            >🔁 Activate</button>
+                          </>
+                        )}
+                        {pmt.status !== 'Void' && pmt.status !== 'Uncollected' && pmt.status !== 'Deposited' && (
+                          <>
+                            <button onClick={() => openEditPayment(pmt)}
+                              style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa', background: 'rgba(59,130,246,0.08)', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, flex: 1 }}
+                            >✏️ Edit</button>
+                            <button onClick={() => handleVoidPayment(pmt.id)}
+                              style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', border: '1px solid rgba(244, 63, 94, 0.3)', color: 'var(--danger)', background: 'rgba(244,63,94,0.08)', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, flex: 1 }}
+                            >🗑️ Void</button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop payment rows */}
+              <div className="tbl-desktop" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {invoice.payments.map((pmt) => (
                   <div className="payment-row"
                     key={pmt.id}
@@ -956,6 +1062,7 @@ export default function InvoiceDetailPage() {
                   </div>
                 ))}
               </div>
+              </>
             )}
           </div>
         </div>

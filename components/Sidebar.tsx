@@ -161,14 +161,6 @@ export default function Sidebar() {
       </Link>
     )}
 
-    {/* Sync Dashboard */}
-    {(isAdmin || isManager) && (
-      <Link href="/sync-dashboard" className={`nav-item ${pathname === '/sync-dashboard' ? 'active' : ''}`}>
-        <span className="icon">🔄</span>
-        Sync Dashboard
-      </Link>
-    )}
-
         {/* ═══ OPERATIONS ═══ */}
         {(canViewCustomers || canViewOrders || canViewInvoices || canViewPayments) && (
           <div className="sidebar-section-label">Operations</div>

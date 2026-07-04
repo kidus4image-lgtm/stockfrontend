@@ -267,7 +267,56 @@ export default function BankTransactionPage({ params }: { params: Promise<{ id: 
       <div className="glass-panel print-area" style={{ padding: '2rem' }}>
         <h3 className="no-print" style={{ marginTop: 0, marginBottom: '1.5rem', fontSize: '1.25rem', color: 'var(--text-main)' }}>Transaction Detail Log</h3>
         
-        <div style={{ overflowX: 'auto' }}>
+        {/* Mobile Cards */}
+        <div className="tbl-mobile">
+          {(() => {
+            const paginatedTransactions = filteredTransactions.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+            return paginatedTransactions.length > 0 ? (
+              paginatedTransactions.map((tx: any) => (
+                <div key={tx.id} className="gen-mobile-card">
+                  <div className="gen-mobile-card-header">
+                    <span className="gen-mobile-card-title">
+                      {tx.invoice?.customer?.customerName || 'Unknown Customer'}
+                    </span>
+                    <span className="status-badge" style={{
+                      background: tx.status === 'Collected' ? 'rgba(16, 185, 129, 0.15)' : tx.status === 'Bounced' ? 'rgba(244, 63, 94, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                      color: tx.status === 'Collected' ? 'var(--success)' : tx.status === 'Bounced' ? 'var(--danger)' : 'var(--warning)',
+                      padding: '0.2rem 0.5rem',
+                      borderRadius: '4px',
+                      fontSize: '0.75rem',
+                      fontWeight: '600'
+                    }}>
+                      {tx.status}
+                    </span>
+                  </div>
+                  <div className="gen-mobile-card-body">
+                    <div className="gen-mobile-card-label">Receipt Date</div>
+                    <div className="gen-mobile-card-value">{new Date(tx.receivedDate || tx.createdAt).toLocaleDateString()}</div>
+                    <div className="gen-mobile-card-label">Inv. Ref</div>
+                    <div className="gen-mobile-card-value">{tx.invoiceNumber || '-'}</div>
+                    <div className="gen-mobile-card-label">Method & Ref</div>
+                    <div className="gen-mobile-card-value">
+                      <strong>{tx.paymentMethod}</strong>
+                      {tx.chequeNumber ? ` | Chq: ${tx.chequeNumber}` : ''}
+                      {tx.slipNumber ? ` | Slip: ${tx.slipNumber}` : ''}
+                    </div>
+                    <div className="gen-mobile-card-label">Amount</div>
+                    <div className="gen-mobile-card-value" style={{ fontWeight: 600, color: tx.status === 'Bounced' ? 'var(--danger)' : 'var(--success)' }}>
+                      ${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="gen-mobile-card">
+                <div className="gen-mobile-card-body" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No transactions found for the selected filters.</div>
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Desktop Table */}
+        <div className="tbl-desktop" style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
@@ -328,35 +377,35 @@ export default function BankTransactionPage({ params }: { params: Promise<{ id: 
               })()}
             </tbody>
           </table>
-          
-          {/* Pagination Controls */}
-          {(() => {
-            const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / rowsPerPage));
-            return (
-              <div className="no-print" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
-                <button 
-                  className="btn-secondary" 
-                  disabled={currentPage === 1} 
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
-                >
-                  Prev
-                </button>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button 
-                  className="btn-secondary" 
-                  disabled={currentPage >= totalPages} 
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
-                >
-                  Next
-                </button>
-              </div>
-            );
-          })()}
         </div>
+
+        {/* Pagination Controls */}
+        {(() => {
+          const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / rowsPerPage));
+          return (
+            <div className="no-print" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
+              <button 
+                className="btn-secondary" 
+                disabled={currentPage === 1} 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+              >
+                Prev
+              </button>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button 
+                className="btn-secondary" 
+                disabled={currentPage >= totalPages} 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+              >
+                Next
+              </button>
+            </div>
+          );
+        })()}
         
         <div className="print-only" style={{ display: 'none', marginTop: '3rem', borderTop: '2px solid #e5e7eb', paddingTop: '1rem', textAlign: 'right' }}>
            <h3 style={{ margin: 0, color: '#111827' }}>Total Filtered Transactions: <span style={{ color: '#10b981' }}>${totalFilteredAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></h3>
@@ -367,41 +416,80 @@ export default function BankTransactionPage({ params }: { params: Promise<{ id: 
         <div className="glass-panel no-print" style={{ padding: '2rem', marginTop: '2rem' }}>
           <h3 style={{ fontWeight: 700, marginTop: 0, marginBottom: '1rem', fontSize: '1.25rem', color: 'var(--text-main)' }}>Bank Ledger</h3>
           {ledgerLoading ? <div style={{ color: 'var(--text-muted)' }}>Loading...</div> : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    {['Date', 'Type', 'Description', 'Debit', 'Credit'].map(h => (
-                      <th key={h} style={{ padding: '0.6rem 1rem', textAlign: h === 'Debit' || h === 'Credit' ? 'right' : 'left', color: 'var(--text-muted)', fontWeight: 600 }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {ledger.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No ledger entries found.</td>
-                    </tr>
-                  ) : ledger.map(entry => (
-                    <tr key={entry.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                      <td style={{ padding: '0.6rem 1rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{new Date(entry.date).toLocaleDateString()}</td>
-                      <td style={{ padding: '0.6rem 1rem' }}>
-                        <span style={{ padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600,
-                          background: entry.debit > 0 ? 'rgba(244,63,94,0.1)' : 'rgba(16,185,129,0.1)',
-                          color: entry.debit > 0 ? 'var(--danger)' : 'var(--success)'
-                        }}>{entry.type.replace(/_/g, ' ')}</span>
-                      </td>
-                      <td style={{ padding: '0.6rem 1rem', color: 'var(--text-main)' }}>{entry.description}</td>
-                      <td style={{ padding: '0.6rem 1rem', textAlign: 'right', color: entry.debit > 0 ? 'var(--danger)' : 'var(--text-muted)' }}>
+            <>
+              {/* Mobile Cards */}
+              <div className="tbl-mobile">
+                {ledger.length === 0 ? (
+                  <div className="gen-mobile-card">
+                    <div className="gen-mobile-card-body" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No ledger entries found.</div>
+                  </div>
+                ) : ledger.map(entry => (
+                  <div key={entry.id} className="gen-mobile-card">
+                    <div className="gen-mobile-card-header">
+                      <span className="gen-mobile-card-title" style={{ fontSize: '0.85rem' }}>{entry.type.replace(/_/g, ' ')}</span>
+                      <span className="gen-mobile-card-value" style={{ fontWeight: 600, color: entry.debit > 0 ? 'var(--danger)' : 'var(--success)' }}>
+                        {entry.debit > 0
+                          ? `-${entry.debit.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                          : entry.credit > 0
+                            ? `+${entry.credit.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                            : '—'}
+                      </span>
+                    </div>
+                    <div className="gen-mobile-card-body">
+                      <div className="gen-mobile-card-label">Date</div>
+                      <div className="gen-mobile-card-value">{new Date(entry.date).toLocaleDateString()}</div>
+                      <div className="gen-mobile-card-label">Description</div>
+                      <div className="gen-mobile-card-value">{entry.description}</div>
+                      <div className="gen-mobile-card-label">Debit</div>
+                      <div className="gen-mobile-card-value" style={{ color: entry.debit > 0 ? 'var(--danger)' : 'var(--text-muted)' }}>
                         {entry.debit > 0 ? entry.debit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
-                      </td>
-                      <td style={{ padding: '0.6rem 1rem', textAlign: 'right', color: entry.credit > 0 ? 'var(--success)' : 'var(--text-muted)' }}>
+                      </div>
+                      <div className="gen-mobile-card-label">Credit</div>
+                      <div className="gen-mobile-card-value" style={{ color: entry.credit > 0 ? 'var(--success)' : 'var(--text-muted)' }}>
                         {entry.credit > 0 ? entry.credit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
-                      </td>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table */}
+              <div className="tbl-desktop" style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      {['Date', 'Type', 'Description', 'Debit', 'Credit'].map(h => (
+                        <th key={h} style={{ padding: '0.6rem 1rem', textAlign: h === 'Debit' || h === 'Credit' ? 'right' : 'left', color: 'var(--text-muted)', fontWeight: 600 }}>{h}</th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {ledger.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No ledger entries found.</td>
+                      </tr>
+                    ) : ledger.map(entry => (
+                      <tr key={entry.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                        <td style={{ padding: '0.6rem 1rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{new Date(entry.date).toLocaleDateString()}</td>
+                        <td style={{ padding: '0.6rem 1rem' }}>
+                          <span style={{ padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600,
+                            background: entry.debit > 0 ? 'rgba(244,63,94,0.1)' : 'rgba(16,185,129,0.1)',
+                            color: entry.debit > 0 ? 'var(--danger)' : 'var(--success)'
+                          }}>{entry.type.replace(/_/g, ' ')}</span>
+                        </td>
+                        <td style={{ padding: '0.6rem 1rem', color: 'var(--text-main)' }}>{entry.description}</td>
+                        <td style={{ padding: '0.6rem 1rem', textAlign: 'right', color: entry.debit > 0 ? 'var(--danger)' : 'var(--text-muted)' }}>
+                          {entry.debit > 0 ? entry.debit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
+                        </td>
+                        <td style={{ padding: '0.6rem 1rem', textAlign: 'right', color: entry.credit > 0 ? 'var(--success)' : 'var(--text-muted)' }}>
+                          {entry.credit > 0 ? entry.credit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       )}

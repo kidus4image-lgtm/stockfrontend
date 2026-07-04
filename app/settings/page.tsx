@@ -1272,6 +1272,52 @@ function emptyForm(): TemplateFormState {
   };
 }
 
+// ─── Starter presets shown when creating a template ──────────────────
+// Pre-fills the form with a sensible combination of fields so users pick
+// a starting point instead of ticking every checkbox from scratch.
+interface TemplatePreset {
+  key: string;
+  icon: string;
+  label: string;
+  blurb: string;
+  values: Omit<TemplateFormState, 'id' | 'name' | 'description' | 'isDefault'>;
+}
+
+const TEMPLATE_PRESETS: TemplatePreset[] = [
+  {
+    key: 'minimal',
+    icon: '🧾',
+    label: 'Minimal Receipt',
+    blurb: 'Just the essentials — no logo or contact details.',
+    values: { showLogo: false, showAddress: false, showPhone: false, showTin: false, orientation: 'portrait', footerText: '' },
+  },
+  {
+    key: 'standard',
+    icon: '📄',
+    label: 'Standard Invoice',
+    blurb: 'Logo, address and phone — a good default for most documents.',
+    values: { showLogo: true, showAddress: true, showPhone: true, showTin: false, orientation: 'portrait', footerText: '' },
+  },
+  {
+    key: 'compliance',
+    icon: '🏛️',
+    label: 'Detailed / Compliance',
+    blurb: 'Everything shown, including TIN — for tax or audit-facing documents.',
+    values: { showLogo: true, showAddress: true, showPhone: true, showTin: true, orientation: 'portrait', footerText: 'This document is computer-generated and legally valid without a signature.' },
+  },
+  {
+    key: 'landscape',
+    icon: '📊',
+    label: 'Landscape Report',
+    blurb: 'Wide layout for reports with many columns.',
+    values: { showLogo: true, showAddress: true, showPhone: false, showTin: false, orientation: 'landscape', footerText: '' },
+  },
+];
+
+function formFromPreset(preset: TemplatePreset): TemplateFormState {
+  return { ...emptyForm(), name: preset.label, ...preset.values };
+}
+
 function TemplateManagementTab({
   templates,
   onSave,
@@ -1287,9 +1333,23 @@ function TemplateManagementTab({
 }) {
   const [form, setForm] = useState<TemplateFormState>(() => emptyForm());
   const [showForm, setShowForm] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
 
   function handleEdit(t: DocumentTemplate) {
     setForm({ ...t });
+    setShowPicker(false);
+    setShowForm(true);
+  }
+
+  function handlePickPreset(preset: TemplatePreset) {
+    setForm(formFromPreset(preset));
+    setShowPicker(false);
+    setShowForm(true);
+  }
+
+  function handleStartBlank() {
+    setForm(emptyForm());
+    setShowPicker(false);
     setShowForm(true);
   }
 
@@ -1321,7 +1381,7 @@ function TemplateManagementTab({
   const checkRowStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: readOnly ? 'default' : 'pointer' };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: showForm ? '1fr 1fr' : '1fr', gap: '2rem' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: (showForm || showPicker) ? '1fr 1fr' : '1fr', gap: '2rem' }}>
 
       {/* ── Template List ── */}
       <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px' }}>
@@ -1329,7 +1389,7 @@ function TemplateManagementTab({
           <h2 style={{ fontSize: '1.35rem', fontWeight: '800', margin: 0 }}>Report Templates</h2>
           {!readOnly && (
             <button
-              onClick={() => { setForm(emptyForm()); setShowForm(true); }}
+              onClick={() => { setShowForm(false); setShowPicker(true); }}
               style={{ background: 'var(--accent)', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: '700', fontSize: '0.85rem', cursor: 'pointer' }}
             >
               + New Template
@@ -1411,6 +1471,65 @@ function TemplateManagementTab({
           </div>
         )}
       </div>
+
+      {/* ── Preset Picker ── */}
+      {showPicker && (
+        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <h2 style={{ fontSize: '1.35rem', fontWeight: '800', margin: 0 }}>Choose a Starting Point</h2>
+            <button
+              onClick={() => setShowPicker(false)}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.3rem', cursor: 'pointer', lineHeight: 1 }}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+          </div>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+            Pick a preset to pre-fill the header fields — you can still adjust everything before saving.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.9rem' }}>
+            {TEMPLATE_PRESETS.map((preset) => (
+              <button
+                key={preset.key}
+                onClick={() => handlePickPreset(preset)}
+                style={{
+                  textAlign: 'left', cursor: 'pointer', padding: '1rem',
+                  borderRadius: '12px', border: '1px solid var(--border-color)',
+                  background: 'rgba(255,255,255,0.02)', color: 'inherit',
+                  display: 'flex', flexDirection: 'column', gap: '0.35rem',
+                }}
+              >
+                <span style={{ fontSize: '1.5rem' }}>{preset.icon}</span>
+                <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>{preset.label}</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{preset.blurb}</span>
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.3rem' }}>
+                  <span style={{ background: 'rgba(255,255,255,0.06)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.68rem', color: 'var(--text-muted)' }}>{preset.values.orientation}</span>
+                  {preset.values.showLogo && <span style={{ background: 'rgba(255,255,255,0.06)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.68rem', color: 'var(--text-muted)' }}>Logo</span>}
+                  {preset.values.showAddress && <span style={{ background: 'rgba(255,255,255,0.06)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.68rem', color: 'var(--text-muted)' }}>Address</span>}
+                  {preset.values.showPhone && <span style={{ background: 'rgba(255,255,255,0.06)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.68rem', color: 'var(--text-muted)' }}>Phone</span>}
+                  {preset.values.showTin && <span style={{ background: 'rgba(255,255,255,0.06)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.68rem', color: 'var(--text-muted)' }}>TIN</span>}
+                </div>
+              </button>
+            ))}
+
+            <button
+              onClick={handleStartBlank}
+              style={{
+                cursor: 'pointer', padding: '1rem',
+                borderRadius: '12px', border: '1px dashed var(--border-color)',
+                background: 'transparent', color: 'var(--text-muted)',
+                display: 'flex', flexDirection: 'column', gap: '0.35rem', justifyContent: 'center', alignItems: 'center', textAlign: 'center',
+              }}
+            >
+              <span style={{ fontSize: '1.5rem' }}>➕</span>
+              <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>Start Blank</span>
+              <span style={{ fontSize: '0.75rem' }}>Build from scratch instead</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Template Form ── */}
       {showForm && (

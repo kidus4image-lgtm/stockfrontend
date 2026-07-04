@@ -216,7 +216,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="dashboard-container">
-      <header className="page-header">
+      <header className="inv-detail-header page-header">
         <div>
           <h1 className="text-gradient">{product.name}</h1>
           <p style={{ color: 'var(--text-muted)' }}>
@@ -230,7 +230,7 @@ export default function ProductDetailPage() {
       </header>
 
       {/* KPI Cards */}
-      <div className="dashboard-grid" style={{ marginBottom: '3rem' }}>
+      <div className="dashboard-grid inv-detail-kpi-grid" style={{ marginBottom: '3rem' }}>
         <div className="stat-card glass-panel" style={{ borderLeft: `4px solid ${outOfStock ? '#ef4444' : lowStock ? '#f59e0b' : '#10b981'}` }}>
           <div className="stat-title">Available Stock</div>
           <div className="stat-value" style={{ color: outOfStock ? '#ef4444' : lowStock ? '#f59e0b' : '#10b981' }}>
@@ -282,13 +282,73 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
-      <div className="grid-split" style={{ marginBottom: '3rem' }}>
+      <div className="grid-split inv-detail-split">
         {/* Batches */}
         <div className="glass-panel" style={{ padding: '2rem' }}>
           <h3 style={{ marginTop: 0, marginBottom: '1.5rem', fontSize: '1.25rem', color: 'var(--accent-hover)' }}>Batches</h3>
           {(!product.batches || product.batches.length === 0) ? (
             <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>No batches recorded.</p>
           ) : (
+            <>
+            {/* Mobile batch cards */}
+            <div className="inv-detail-table-mobile">
+              {(() => {
+                const start = (batchPage - 1) * rowsPerPage;
+                return product.batches.slice(start, start + rowsPerPage).map((b: any) => {
+                  const avail = b.quantity - (b.reservedQuantity || 0);
+                  return (
+                    <div className="inv-detail-batch-card" key={b.id}>
+                      <div className="inv-detail-batch-card-header">
+                        <span>{b.batchNumber}</span>
+                        <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.45rem', borderRadius: '50px', fontWeight: 700, background: avail > 0 ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)', color: avail > 0 ? '#34d399' : '#ef4444' }}>
+                          {avail} available
+                        </span>
+                      </div>
+                      <div className="inv-detail-batch-card-body">
+                        <div>
+                          <div className="inv-detail-card-label">On Hand</div>
+                          <div className="inv-detail-card-value">{b.quantity}</div>
+                        </div>
+                        <div>
+                          <div className="inv-detail-card-label">Reserved</div>
+                          <div className="inv-detail-card-value" style={{ color: (b.reservedQuantity || 0) > 0 ? '#f59e0b' : 'var(--text-muted)' }}>{b.reservedQuantity || 0}</div>
+                        </div>
+                        <div>
+                          <div className="inv-detail-card-label">Unit Cost</div>
+                          <div className="inv-detail-card-value">${b.purchasePrice.toFixed(2)}</div>
+                        </div>
+                        <div>
+                          <div className="inv-detail-card-label">Total</div>
+                          <div className="inv-detail-card-value" style={{ fontWeight: 700 }}>${(b.quantity * b.purchasePrice).toFixed(2)}</div>
+                        </div>
+                        <div>
+                          <div className="inv-detail-card-label">Received</div>
+                          <div className="inv-detail-card-value" style={{ fontSize: '0.75rem' }}>{new Date(b.receivedDate).toISOString().split('T')[0]}</div>
+                        </div>
+                        <div>
+                          <div className="inv-detail-card-label">Expiry</div>
+                          <div className="inv-detail-card-value" style={{ fontSize: '0.75rem', color: b.expiryDate ? (new Date(b.expiryDate) < new Date() ? '#ef4444' : 'var(--text-muted)') : 'var(--text-muted)' }}>
+                            {b.expiryDate ? new Date(b.expiryDate).toISOString().split('T')[0] : 'N/A'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+              {product.batches.length > rowsPerPage && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
+                  <button className="btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', width: 'auto' }} disabled={batchPage === 1} onClick={() => setBatchPage(p => Math.max(1, p - 1))}>← Prev</button>
+                  <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', padding: '0 0.5rem' }}>
+                    {batchPage} / {Math.ceil(product.batches.length / rowsPerPage)}
+                  </span>
+                  <button className="btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', width: 'auto' }} disabled={batchPage >= Math.ceil(product.batches.length / rowsPerPage)} onClick={() => setBatchPage(p => p + 1)}>Next →</button>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop batch table */}
+            <div className="inv-detail-table-desktop">
             <div className="table-wrap">
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '500px' }}>
                 <thead>
@@ -333,6 +393,8 @@ export default function ProductDetailPage() {
                 </div>
               )}
             </div>
+            </div>
+            </>
           )}
         </div>
 
@@ -342,6 +404,47 @@ export default function ProductDetailPage() {
           {(!product.adjustments || product.adjustments.length === 0) ? (
             <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>No adjustments recorded.</p>
           ) : (
+            <>
+            {/* Mobile adjustment cards */}
+            <div className="inv-detail-table-mobile">
+              {(() => {
+                const start = (adjustmentPage - 1) * rowsPerPage;
+                return product.adjustments.slice(start, start + rowsPerPage).map((a: any) => (
+                  <div className="inv-detail-adj-card" key={a.id}>
+                    <div className="inv-detail-adj-card-header">
+                      <span style={{ fontWeight: 600, color: a.adjustmentType === 'Addition' ? '#10b981' : '#ef4444' }}>{a.adjustmentType}</span>
+                      <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{a.quantityChanged > 0 ? '+' : ''}{a.quantityChanged}</span>
+                    </div>
+                    <div className="inv-detail-adj-card-body">
+                      <div>
+                        <div className="inv-detail-card-label">Reason</div>
+                        <div className="inv-detail-card-value">{a.reason}</div>
+                      </div>
+                      <div>
+                        <div className="inv-detail-card-label">By</div>
+                        <div className="inv-detail-card-value">{a.adjustedBy}</div>
+                      </div>
+                      <div>
+                        <div className="inv-detail-card-label">Date</div>
+                        <div className="inv-detail-card-value" style={{ fontSize: '0.75rem' }}>{new Date(a.createdAt).toISOString().split('T')[0]}</div>
+                      </div>
+                    </div>
+                  </div>
+                ));
+              })()}
+              {product.adjustments.length > rowsPerPage && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
+                  <button className="btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', width: 'auto' }} disabled={adjustmentPage === 1} onClick={() => setAdjustmentPage(p => Math.max(1, p - 1))}>← Prev</button>
+                  <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', padding: '0 0.5rem' }}>
+                    {adjustmentPage} / {Math.ceil(product.adjustments.length / rowsPerPage)}
+                  </span>
+                  <button className="btn-secondary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', width: 'auto' }} disabled={adjustmentPage >= Math.ceil(product.adjustments.length / rowsPerPage)} onClick={() => setAdjustmentPage(p => p + 1)}>Next →</button>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop adjustment table */}
+            <div className="inv-detail-table-desktop">
             <div className="table-wrap">
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '400px' }}>
                 <thead>
@@ -382,6 +485,8 @@ export default function ProductDetailPage() {
                 </div>
               )}
             </div>
+            </div>
+            </>
           )}
         </div>
       </div>
@@ -410,7 +515,7 @@ export default function ProductDetailPage() {
               <div style={{ background: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-hover)', padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600, whiteSpace: 'nowrap' }}>📦 {product.name}</div>
             </div>
             <form onSubmit={handleBatchSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+              <div className="inv-detail-modal-grid">
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>🔖 Batch Number</label>
                   <input type="text" required className="form-control" placeholder="e.g. BAT-12345" value={batchForm.batchNumber} onChange={(e) => setBatchForm({ ...batchForm, batchNumber: e.target.value })} />
@@ -420,7 +525,7 @@ export default function ProductDetailPage() {
                   <input type="number" required className="form-control" placeholder="100" value={batchForm.quantity} onChange={(e) => setBatchForm({ ...batchForm, quantity: e.target.value })} />
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+              <div className="inv-detail-modal-grid">
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>💰 Purchase Price (USD)</label>
                   <input type="number" step="0.01" required className="form-control" placeholder="0.00" value={batchForm.purchasePrice} onChange={(e) => setBatchForm({ ...batchForm, purchasePrice: e.target.value })} />
@@ -452,7 +557,7 @@ export default function ProductDetailPage() {
               <div style={{ background: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-hover)', padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600, whiteSpace: 'nowrap' }}>📦 {product.name}</div>
             </div>
             <form onSubmit={handleAdjustmentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+              <div className="inv-detail-modal-grid">
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>🏷️ Select Batch</label>
                   <select className="form-control" value={adjustmentForm.batchId} required={adjustmentForm.adjustmentType === 'Addition'} onChange={(e) => setAdjustmentForm({ ...adjustmentForm, batchId: e.target.value })}>
@@ -473,7 +578,7 @@ export default function ProductDetailPage() {
                   </select>
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+              <div className="inv-detail-modal-grid">
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>📊 Quantity to Change</label>
                   <input type="number" required className="form-control" placeholder="10" value={adjustmentForm.quantityChanged} onChange={(e) => setAdjustmentForm({ ...adjustmentForm, quantityChanged: e.target.value })} />
@@ -505,7 +610,7 @@ export default function ProductDetailPage() {
               <div style={{ background: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-hover)', padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600, whiteSpace: 'nowrap' }}>📦 {product.name}</div>
             </div>
             <form onSubmit={handleEditProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+              <div className="inv-detail-modal-grid">
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>🏷️ Product Name</label>
                   <input type="text" required className="form-control" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
@@ -519,7 +624,7 @@ export default function ProductDetailPage() {
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>📄 Description</label>
                 <input type="text" className="form-control" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+              <div className="inv-detail-modal-grid">
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>💰 Selling Price ($)</label>
                   <input type="number" step="0.01" required className="form-control" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} />
@@ -529,7 +634,7 @@ export default function ProductDetailPage() {
                   <input type="number" className="form-control" value={editForm.minStock} onChange={(e) => setEditForm({ ...editForm, minStock: e.target.value })} />
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.25rem' }}>
+              <div className="inv-detail-modal-grid-3">
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>📏 Purchase Unit</label>
                   <input type="text" className="form-control" placeholder="e.g. pcs" value={editForm.purchaseUnit} onChange={(e) => setEditForm({ ...editForm, purchaseUnit: e.target.value })} />

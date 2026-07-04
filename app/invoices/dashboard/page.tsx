@@ -364,7 +364,7 @@ export default function InvoicesDashboard() {
 
   return (
     <div className="dashboard-container">
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <header className="gen-page-header" style={{ marginBottom: '2rem' }}>
         <div>
           <h1 className="text-gradient" style={{ fontSize: '2.4rem', margin: 0, fontWeight: 800 }}>Invoices Dashboard</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
@@ -721,7 +721,70 @@ export default function InvoicesDashboard() {
       {/* Filtered Invoices Table */}
       <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
         <h3 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1.15rem', color: 'var(--accent-hover)' }}>📋 Filtered Invoices</h3>
-        <div style={{ overflowX: 'auto' }}>
+        <div className="tbl-mobile">
+          {paginatedInvoices.length > 0 ? (
+            paginatedInvoices.map((inv: any) => {
+              const statusName = inv.computedStatus || inv.status;
+              const statusColor = (() => {
+                switch (statusName) {
+                  case 'Critical': return { background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' };
+                  case 'Overdue': return { background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' };
+                  case 'Today': return { background: 'rgba(251, 191, 36, 0.15)', color: '#fbbf24' };
+                  case 'This Week': return { background: 'rgba(52, 211, 153, 0.15)', color: '#34d399' };
+                  case 'Upcoming': return { background: 'rgba(96, 165, 250, 0.15)', color: '#60a5fa' };
+                  case 'Paid': return { background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' };
+                  case 'Void': return { background: 'rgba(156, 163, 175, 0.15)', color: '#9ca3af' };
+                  default: return { background: 'rgba(255,255,255,0.15)', color: '#ffffff' };
+                }
+              })();
+              return (
+                <div className="gen-mobile-card" key={inv.id}>
+                  <div className="gen-mobile-card-header">
+                    <Link href={`/invoices/${inv.id}`} className="gen-mobile-card-title" style={{ textDecoration: 'none', color: 'var(--accent-hover)' }}>
+                      {inv.invoiceNumber}
+                    </Link>
+                    <span style={{ ...statusColor, padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 600 }}>
+                      {statusName}
+                    </span>
+                  </div>
+                  <div className="gen-mobile-card-body">
+                    <div>
+                      <div className="gen-mobile-card-label">Customer</div>
+                      <div className="gen-mobile-card-value">{inv.customer?.customerName || '-'}</div>
+                    </div>
+                    <div>
+                      <div className="gen-mobile-card-label">Sales Rep</div>
+                      <div className="gen-mobile-card-value">{inv.salesRep ? `${inv.salesRep.firstName} ${inv.salesRep.lastName}` : '—'}</div>
+                    </div>
+                    <div>
+                      <div className="gen-mobile-card-label">Type</div>
+                      <div className="gen-mobile-card-value" style={{ color: inv.salesType === 'Cash' ? '#10b981' : inv.salesType === 'Credit' ? '#60a5fa' : 'var(--text-muted)', fontWeight: 600 }}>
+                        {inv.salesType || '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="gen-mobile-card-label">Due Date</div>
+                      <div className="gen-mobile-card-value">{inv.paymentDate ? new Date(inv.paymentDate).toLocaleDateString() : '-'}</div>
+                    </div>
+                    <div>
+                      <div className="gen-mobile-card-label">Amount</div>
+                      <div className="gen-mobile-card-value" style={{ fontWeight: 600 }}>${(inv.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    </div>
+                    <div>
+                      <div className="gen-mobile-card-label">Outstanding</div>
+                      <div className="gen-mobile-card-value" style={{ color: inv.remainingPayment > 0 ? 'var(--warning)' : 'var(--success)', fontWeight: 600 }}>
+                        ${(inv.remainingPayment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>No invoices match the selected filters.</p>
+          )}
+        </div>
+        <div className="tbl-desktop" style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>

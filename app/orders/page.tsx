@@ -275,17 +275,13 @@ export default function OrdersPage() {
     <div className="dashboard-container" style={{ animation: 'fadeIn 0.5s ease-out', paddingBottom: '4rem' }}>
       
       {/* Premium Header */}
-      <header style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
+      <header className="orders-page-header" style={{
         marginBottom: '2rem',
         padding: '2rem',
         background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.4) 100%)',
         borderRadius: '16px',
         border: '1px solid rgba(255,255,255,0.05)',
         boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)',
-        flexWrap: 'wrap',
         gap: '1.5rem'
       }}>
         <div>
@@ -315,7 +311,7 @@ export default function OrdersPage() {
       <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
         {/* Row 1: search + sort + advanced toggle */}
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="orders-filters-row">
           <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
             <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>🔍</span>
             <input
@@ -378,7 +374,7 @@ export default function OrdersPage() {
 
         {/* Advanced filters: date range + amount range */}
         {showAdvanced && (
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', paddingTop: '0.25rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="orders-advanced-filters" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', paddingTop: '0.25rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Date range:</span>
             <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
               style={{ padding: '0.55rem 0.75rem', background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#f8fafc', fontSize: '0.82rem', outline: 'none', colorScheme: 'dark' }} />
@@ -455,8 +451,160 @@ export default function OrdersPage() {
           <div style={{ fontSize: '1.1rem' }}>No orders found matching your criteria.</div>
         </div>
       ) : (
-        <div className="glass-panel" style={{ padding: '0', overflowX: 'auto', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '1100px' }}>
+        <>
+        {/* Mobile card view */}
+        <div className="orders-mobile-cards">
+          {filteredOrders.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((order) => {
+            const statusColor =
+              order.status === 'Pending' ? '#fbbf24' :
+              order.status === 'Customer_Confirmed' ? '#34d399' :
+              order.status === 'Finance_Approved' ? '#60a5fa' :
+              order.status === 'Manager_Approved' ? '#f97316' :
+              order.status === 'Store_Confirmed' ? '#c084fc' :
+              order.status === 'Rejected' ? '#fb7185' :
+              '#10b981';
+            return (
+              <div className="order-mobile-card" key={order.id}>
+                <div className="order-mobile-card-header">
+                  <span className="order-mobile-card-number" onClick={() => router.push(`/orders/${order.id}`)}>
+                    {order.orderNumber}
+                  </span>
+                  <span style={{
+                    background: `color-mix(in srgb, ${statusColor} 15%, transparent)`,
+                    color: statusColor,
+                    padding: '0.2rem 0.55rem',
+                    borderRadius: '50px',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    border: `1px solid color-mix(in srgb, ${statusColor} 35%, transparent)`,
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {order.status.replace('_', ' ')}
+                  </span>
+                </div>
+                <div className="order-mobile-card-body">
+                  <div>
+                    <div className="order-mobile-card-label">Customer</div>
+                    <div className="order-mobile-card-value">{order.customer?.customerName || 'Unknown'}</div>
+                  </div>
+                  <div>
+                    <div className="order-mobile-card-label">Date</div>
+                    <div className="order-mobile-card-value">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '-'}</div>
+                  </div>
+                  <div>
+                    <div className="order-mobile-card-label">Type</div>
+                    <div>
+                      <span style={{
+                        background: order.salesType === 'Cash' ? 'rgba(16,185,129,0.15)' : 'rgba(96,165,250,0.15)',
+                        color: order.salesType === 'Cash' ? '#34d399' : '#60a5fa',
+                        padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600,
+                        border: `1px solid ${order.salesType === 'Cash' ? 'rgba(16,185,129,0.3)' : 'rgba(96,165,250,0.3)'}`
+                      }}>
+                        {order.salesType}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="order-mobile-card-label">Amount</div>
+                    <div className="order-mobile-card-value" style={{ fontWeight: 700, color: '#f8fafc' }}>
+                      ${order.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </div>
+                  </div>
+                </div>
+                <div className="order-mobile-card-actions">
+                  {order.status === 'Pending' && canEditOrder(order) && (
+                    <>
+                      <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'linear-gradient(135deg, #10b981, #059669)', border: 'none', color: '#fff', borderRadius: '6px', cursor: 'pointer' }} onClick={() => handleCustomerConfirm(order.id)} disabled={processingId === order.id}>
+                        {processingId === order.id ? '...' : 'Confirm'}
+                      </button>
+                      <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', borderRadius: '6px', cursor: 'pointer' }} onClick={() => router.push(`/orders/${order.id}/edit`)}>
+                        Edit
+                      </button>
+                    </>
+                  )}
+                  {order.status === 'Pending' && (userRole === 'finance' || userRole === 'admin' || userRole === 'administrator') && (
+                    <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'rgba(244,63,94,0.15)', border: '1px solid rgba(244,63,94,0.3)', color: '#fb7185', borderRadius: '6px', cursor: 'pointer' }} onClick={() => openDeclineModal(order)}>
+                      Decline
+                    </button>
+                  )}
+                  {order.status === 'Customer_Confirmed' && (userRole === 'finance' || userRole === 'admin' || userRole === 'administrator') && (
+                    <>
+                      <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', border: 'none', color: '#fff', borderRadius: '6px', cursor: 'pointer' }} onClick={() => handleFinanceApprove(order.id)} disabled={processingId === order.id}>
+                        {processingId === order.id ? '...' : 'Finance Approve'}
+                      </button>
+                      <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'rgba(244,63,94,0.15)', border: '1px solid rgba(244,63,94,0.3)', color: '#fb7185', borderRadius: '6px', cursor: 'pointer' }} onClick={() => openDeclineModal(order)}>
+                        Decline
+                      </button>
+                    </>
+                  )}
+                  {order.status === 'Manager_Approved' && (
+                    <>
+                      <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'linear-gradient(135deg, #eab308, #ca8a04)', border: 'none', color: '#000', borderRadius: '6px', cursor: 'pointer' }} onClick={() => router.push(`/orders/${order.id}/assign-batches`)}>
+                        Batches
+                      </button>
+                      {(userRole === 'manager' || userRole === 'admin' || userRole === 'administrator') && (
+                        <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'rgba(244,63,94,0.15)', border: '1px solid rgba(244,63,94,0.3)', color: '#fb7185', borderRadius: '6px', cursor: 'pointer' }} onClick={() => openDeclineModal(order)}>
+                          Decline
+                        </button>
+                      )}
+                    </>
+                  )}
+                  {order.status === 'Finance_Approved' && (userRole === 'manager' || userRole === 'admin' || userRole === 'administrator') && (
+                    <>
+                      <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'linear-gradient(135deg, #f97316, #ea580c)', border: 'none', color: '#fff', borderRadius: '6px', cursor: 'pointer' }} onClick={() => handleManagerApprove(order.id)} disabled={processingId === order.id}>
+                        {processingId === order.id ? '...' : 'Approve'}
+                      </button>
+                      <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'rgba(244,63,94,0.15)', border: '1px solid rgba(244,63,94,0.3)', color: '#fb7185', borderRadius: '6px', cursor: 'pointer' }} onClick={() => openDeclineModal(order)}>
+                        Decline
+                      </button>
+                    </>
+                  )}
+                  {order.status === 'Store_Confirmed' && userRole === 'cashier' && (
+                    <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'linear-gradient(135deg, #10b981, #059669)', border: 'none', color: '#fff', borderRadius: '6px', cursor: 'pointer' }} onClick={() => openConfirmModal(order)} disabled={processingId === order.id}>
+                      {processingId === order.id ? '...' : 'Confirm'}
+                    </button>
+                  )}
+                  {order.status === 'Completed' && (
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>Completed</span>
+                  )}
+                  {order.status === 'Rejected' && (
+                    <>
+                      <span style={{ color: '#fb7185', fontSize: '0.78rem', background: 'rgba(244,63,94,0.1)', padding: '0.25rem 0.5rem', borderRadius: '4px' }} title={order.rejectReason ? `Reason: ${order.rejectReason}${order.rejectedBy ? ` (by ${order.rejectedBy})` : ''}` : 'Declined'}>
+                        {order.rejectReason ? order.rejectReason.slice(0, 20) + (order.rejectReason.length > 20 ? '…' : '') : 'Declined'}
+                      </span>
+                      {canEditOrder(order) && (
+                        <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'linear-gradient(135deg, #3b82f6, #2563eb)', border: 'none', color: '#fff', borderRadius: '6px', cursor: 'pointer' }} onClick={() => router.push(`/orders/${order.id}/edit`)}>
+                          Resubmit
+                        </button>
+                      )}
+                    </>
+                  )}
+                  <button style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', fontWeight: 600, background: 'rgba(56,189,248,0.15)', border: '1px solid rgba(56,189,248,0.3)', color: '#38bdf8', borderRadius: '6px', cursor: 'pointer' }} onClick={() => router.push(`/orders/${order.id}`)}>
+                    View
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+          {/* Mobile pagination */}
+          {filteredOrders.length > rowsPerPage && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', alignItems: 'center', padding: '1.25rem 0' }}>
+              <button style={{ padding: '0.5rem 1rem', fontSize: '0.82rem', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: page === 1 ? 'var(--text-muted)' : '#fff', cursor: page === 1 ? 'not-allowed' : 'pointer' }} disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
+                ← Prev
+              </button>
+              <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{page} / {Math.ceil(filteredOrders.length / rowsPerPage)}</span>
+              <button style={{ padding: '0.5rem 1rem', fontSize: '0.82rem', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: page >= Math.ceil(filteredOrders.length / rowsPerPage) ? 'var(--text-muted)' : '#fff', cursor: page >= Math.ceil(filteredOrders.length / rowsPerPage) ? 'not-allowed' : 'pointer' }} disabled={page >= Math.ceil(filteredOrders.length / rowsPerPage)} onClick={() => setPage(p => p + 1)}>
+                Next →
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop table view */}
+        <div className="glass-panel orders-table-desktop-only orders-table-wrap" style={{ padding: 0 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ background: 'rgba(15,23,42,0.8)', color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 <th style={{ padding: '1.25rem 1.5rem', borderTopLeftRadius: '16px' }}>Order #</th>
@@ -691,6 +839,7 @@ export default function OrdersPage() {
             </div>
           )}
         </div>
+        </>
       )}
 
       {/* Decline Reason Modal */}

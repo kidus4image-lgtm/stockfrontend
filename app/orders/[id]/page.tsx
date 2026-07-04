@@ -355,10 +355,7 @@ export default function OrderDetailPage() {
     <div className="dashboard-container" style={{ paddingBottom: '6rem', animation: 'fadeIn 0.5s ease-out' }}>
       
       {/* Premium Header */}
-      <header style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start',
+      <header className="order-detail-header" style={{ 
         marginBottom: '2rem',
         padding: '1.5rem',
         background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.4) 100%)',
@@ -414,7 +411,7 @@ export default function OrderDetailPage() {
 
       {/* Visual Status Stepper */}
       {order.status !== 'Rejected' && (
-        <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+        <div className="glass-panel order-detail-stepper" style={{ padding: '2rem', marginBottom: '2rem' }}>
           <div style={{ position: 'absolute', top: '50%', left: '4rem', right: '4rem', height: '2px', background: 'rgba(255,255,255,0.1)', zIndex: 0, transform: 'translateY(-50%)' }}></div>
           
           {[
@@ -454,7 +451,7 @@ export default function OrderDetailPage() {
       )}
 
       {/* KPI Cards */}
-      <div className="dashboard-grid" style={{ marginBottom: '2rem' }}>
+      <div className="dashboard-grid order-detail-kpi-grid" style={{ marginBottom: '2rem' }}>
         <div className="stat-card glass-panel" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#818cf8' }}>
             💵
@@ -514,7 +511,7 @@ export default function OrderDetailPage() {
             </Link>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+          <div className="order-detail-customer-grid">
             {[
               { label: 'Balance', value: order.customer.balance, color: '#6366f1' },
               { label: 'Overdue', value: order.customerSummary?.overdueAmount, color: (order.customerSummary?.overdueAmount || 0) > 0 ? '#ef4444' : '#10b981' },
@@ -539,8 +536,65 @@ export default function OrderDetailPage() {
         <h3 style={{ margin: '0 0 1.25rem 0', fontSize: '1.1rem', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span>📋</span> Order Line Items
         </h3>
-        <div className="table-responsive">
-          <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0', minWidth: '700px' }}>
+
+        {/* Mobile card view */}
+        <div className="order-detail-items-mobile">
+          {order.items?.map((item: any, idx: number) => {
+            const allocatedQty = item.allocations?.reduce((s: number, a: any) => s + a.quantity, 0) || 0;
+            const isFullyAllocated = allocatedQty >= item.quantity;
+            return (
+              <div className="order-item-mobile-card" key={item.id}>
+                <div className="order-item-mobile-card-header">
+                  <Link href={`/inventory/${item.productId}`} style={{ color: '#f8fafc', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>
+                    {item.product?.name || `Product #${item.productId}`}
+                  </Link>
+                  <span style={{
+                    padding: '0.2rem 0.5rem', borderRadius: '50px', fontSize: '0.68rem', fontWeight: 700,
+                    background: isFullyAllocated ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
+                    color: isFullyAllocated ? '#34d399' : '#fbbf24'
+                  }}>
+                    {allocatedQty}/{item.quantity} alloc
+                  </span>
+                </div>
+                <div className="order-item-mobile-card-body">
+                  <div>
+                    <div className="order-item-mobile-label">Qty</div>
+                    <div className="order-item-mobile-value">{item.quantity}</div>
+                  </div>
+                  <div>
+                    <div className="order-item-mobile-label">Unit Price</div>
+                    <div className="order-item-mobile-value">${(item.price || 0).toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="order-item-mobile-label">Subtotal</div>
+                    <div className="order-item-mobile-value" style={{ color: '#38bdf8', fontWeight: 700 }}>${((item.price || 0) * item.quantity).toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="order-item-mobile-label">SKU</div>
+                    <div className="order-item-mobile-value" style={{ fontSize: '0.75rem' }}>{item.product?.sku || '—'}</div>
+                  </div>
+                </div>
+                {item.allocations?.length > 0 && (
+                  <div className="order-item-mobile-alloc">
+                    <div className="order-item-mobile-label" style={{ marginBottom: '0.25rem' }}>Batch Details</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+                      {item.allocations.map((a: any, i: number) => (
+                        <span key={i} style={{ background: 'rgba(255,255,255,0.05)', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          {a.batch?.batchNumber || 'N/A'}: <strong style={{ color: '#f8fafc' }}>{a.quantity}</strong>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop table view */}
+        <div className="order-detail-items-desktop">
+          <div className="table-responsive">
+            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0', minWidth: '700px' }}>
             <thead>
               <tr>
                 <th style={{ padding: '1rem', background: 'rgba(15,23,42,0.8)', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>Product</th>
@@ -591,11 +645,12 @@ export default function OrderDetailPage() {
             </tbody>
           </table>
         </div>
+        </div>
       </div>
 
       {/* Floating Action Bar */}
-      <div className="sticky-footer-bar" style={{ justifyContent: 'center' }}>
-        <div style={{ display: 'flex', gap: '1rem', width: '100%', maxWidth: '1200px', justifyContent: 'flex-end', alignItems: 'center' }}>
+      <div className="sticky-footer-bar">
+        <div className="order-detail-action-bar">
           
           <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '1rem' }}>
             {order.status === 'Rejected' && order.rejectReason && (

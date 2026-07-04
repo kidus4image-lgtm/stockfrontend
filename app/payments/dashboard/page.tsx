@@ -263,7 +263,7 @@ export default function PaymentsDashboardPage() {
 
   return (
     <div className="dashboard-container">
-      <header className="page-header">
+      <header className="page-header gen-page-header">
         <div>
           <h1 className="text-gradient" style={{ fontSize: '2.2rem', margin: 0, fontWeight: 800 }}>
             Payments Dashboard
@@ -409,30 +409,61 @@ export default function PaymentsDashboardPage() {
               {aggregates.bankBreakdown.length === 0 ? (
                 <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '1.5rem', fontSize: '0.85rem' }}>No bank data available.</p>
               ) : (
-                <div className="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th style={{ padding: '0.6rem 0.5rem' }}>Bank</th>
-                        <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Count</th>
-                        <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Total</th>
-                        <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Collected</th>
-                        <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Pending</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {aggregates.bankBreakdown.map(b => (
-                        <tr key={b.bank} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '0.6rem 0.5rem', fontWeight: 600 }}>{b.bank}</td>
-                          <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>{b.count}</td>
-                          <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>{formatCurrency(b.total)}</td>
-                          <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right', color: 'var(--success)' }}>{formatCurrency(b.collected)}</td>
-                          <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right', color: 'var(--warning)' }}>{formatCurrency(b.pending)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <>
+                  <div className="tbl-mobile">
+                    {aggregates.bankBreakdown.map(b => (
+                      <div className="gen-mobile-card" key={b.bank}>
+                        <div className="gen-mobile-card-header">
+                          <span className="gen-mobile-card-title">{b.bank}</span>
+                        </div>
+                        <div className="gen-mobile-card-body">
+                          <div>
+                            <div className="gen-mobile-card-label">Count</div>
+                            <div className="gen-mobile-card-value">{b.count}</div>
+                          </div>
+                          <div>
+                            <div className="gen-mobile-card-label">Total</div>
+                            <div className="gen-mobile-card-value">{formatCurrency(b.total)}</div>
+                          </div>
+                          <div>
+                            <div className="gen-mobile-card-label">Collected</div>
+                            <div className="gen-mobile-card-value" style={{ color: 'var(--success)' }}>{formatCurrency(b.collected)}</div>
+                          </div>
+                          <div>
+                            <div className="gen-mobile-card-label">Pending</div>
+                            <div className="gen-mobile-card-value" style={{ color: 'var(--warning)' }}>{formatCurrency(b.pending)}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="tbl-desktop">
+                    <div className="table-wrap">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th style={{ padding: '0.6rem 0.5rem' }}>Bank</th>
+                            <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Count</th>
+                            <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Total</th>
+                            <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Collected</th>
+                            <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Pending</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {aggregates.bankBreakdown.map(b => (
+                            <tr key={b.bank} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.85rem' }}>
+                              <td style={{ padding: '0.6rem 0.5rem', fontWeight: 600 }}>{b.bank}</td>
+                              <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>{b.count}</td>
+                              <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>{formatCurrency(b.total)}</td>
+                              <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right', color: 'var(--success)' }}>{formatCurrency(b.collected)}</td>
+                              <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right', color: 'var(--warning)' }}>{formatCurrency(b.pending)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
 
@@ -441,26 +472,49 @@ export default function PaymentsDashboardPage() {
               {aggregates.topCustomers.length === 0 ? (
                 <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '1.5rem', fontSize: '0.85rem' }}>No customer payments yet.</p>
               ) : (
-                <div className="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th style={{ padding: '0.6rem 0.5rem' }}>Customer</th>
-                        <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Payments</th>
-                        <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Total Paid</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {aggregates.topCustomers.map((c, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '0.6rem 0.5rem', fontWeight: 600, color: 'var(--accent-hover)' }}>{c.name}</td>
-                          <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>{c.count}</td>
-                          <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right', fontWeight: 700, color: 'var(--success)' }}>{formatCurrency(c.total)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <>
+                  <div className="tbl-mobile">
+                    {aggregates.topCustomers.map((c, idx) => (
+                      <div className="gen-mobile-card" key={idx}>
+                        <div className="gen-mobile-card-header">
+                          <span className="gen-mobile-card-title" style={{ color: 'var(--accent-hover)' }}>{c.name}</span>
+                        </div>
+                        <div className="gen-mobile-card-body">
+                          <div>
+                            <div className="gen-mobile-card-label">Payments</div>
+                            <div className="gen-mobile-card-value">{c.count}</div>
+                          </div>
+                          <div>
+                            <div className="gen-mobile-card-label">Total Paid</div>
+                            <div className="gen-mobile-card-value" style={{ fontWeight: 700, color: 'var(--success)' }}>{formatCurrency(c.total)}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="tbl-desktop">
+                    <div className="table-wrap">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th style={{ padding: '0.6rem 0.5rem' }}>Customer</th>
+                            <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Payments</th>
+                            <th style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>Total Paid</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {aggregates.topCustomers.map((c, idx) => (
+                            <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.85rem' }}>
+                              <td style={{ padding: '0.6rem 0.5rem', fontWeight: 600, color: 'var(--accent-hover)' }}>{c.name}</td>
+                              <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right' }}>{c.count}</td>
+                              <td style={{ padding: '0.6rem 0.5rem', textAlign: 'right', fontWeight: 700, color: 'var(--success)' }}>{formatCurrency(c.total)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -542,97 +596,172 @@ export default function PaymentsDashboardPage() {
               </div>
             </div>
 
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th style={{ padding: '0.85rem 0.75rem', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('receivedDate')}>
-                      Received <SortIcon column="receivedDate" />
-                    </th>
-                    <th style={{ padding: '0.85rem 0.75rem' }}>Invoice</th>
-                    <th style={{ padding: '0.85rem 0.75rem', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('customer')}>
-                      Customer <SortIcon column="customer" />
-                    </th>
-                    <th style={{ padding: '0.85rem 0.75rem', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('method')}>
-                      Method <SortIcon column="method" />
-                    </th>
-                    <th style={{ padding: '0.85rem 0.75rem', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('bank')}>
-                      Bank / Reference <SortIcon column="bank" />
-                    </th>
-                    <th style={{ padding: '0.85rem 0.75rem', textAlign: 'right', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('amount')}>
-                      Amount <SortIcon column="amount" />
-                    </th>
-                    <th style={{ padding: '0.85rem 0.75rem', textAlign: 'center', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('status')}>
-                      Status <SortIcon column="status" />
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedPayments.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                        No payments match your filters.
-                      </td>
-                    </tr>
-                  ) : (
-                    paginatedPayments.map((p) => {
-                      const statusStyle = getStatusStyle(p.status);
-                      return (
-                        <tr key={p.id} className="hover-row" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '0.75rem' }}>{formatDate(p.receivedDate)}</td>
-                          <td style={{ padding: '0.75rem' }}>
+            <div className="tbl-mobile">
+              {paginatedPayments.length === 0 ? (
+                <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '1.5rem', fontSize: '0.85rem' }}>No payments match your filters.</p>
+              ) : (
+                paginatedPayments.map((p) => {
+                  const statusStyle = getStatusStyle(p.status);
+                  return (
+                    <div className="gen-mobile-card" key={p.id}>
+                      <div className="gen-mobile-card-header">
+                        <span className="gen-mobile-card-title">{p.invoice?.customer?.customerName || '—'}</span>
+                        <span style={{
+                          ...statusStyle,
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '4px',
+                          fontSize: '0.7rem',
+                          fontWeight: 600
+                        }}>
+                          {p.status}
+                        </span>
+                      </div>
+                      <div className="gen-mobile-card-body">
+                        <div>
+                          <div className="gen-mobile-card-label">Amount</div>
+                          <div className="gen-mobile-card-value" style={{ fontWeight: 700 }}>{formatCurrency(p.amount)}</div>
+                        </div>
+                        <div>
+                          <div className="gen-mobile-card-label">Method</div>
+                          <div className="gen-mobile-card-value">{p.paymentMethod}</div>
+                        </div>
+                        <div>
+                          <div className="gen-mobile-card-label">Received</div>
+                          <div className="gen-mobile-card-value">{formatDate(p.receivedDate)}</div>
+                        </div>
+                        <div>
+                          <div className="gen-mobile-card-label">Invoice</div>
+                          <div className="gen-mobile-card-value">
                             <Link
                               href={`/invoices/${p.invoice?.id}`}
                               style={{ color: 'var(--accent-hover)', textDecoration: 'none', fontWeight: 600 }}
                             >
                               {p.invoice?.invoiceNumber || '—'}
                             </Link>
-                          </td>
-                          <td style={{ padding: '0.75rem' }}>{p.invoice?.customer?.customerName || '—'}</td>
-                          <td style={{ padding: '0.75rem' }}>
-                            <span style={{ padding: '0.2rem 0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', fontSize: '0.75rem' }}>
-                              {p.paymentMethod}
-                            </span>
-                          </td>
-                          <td style={{ padding: '0.75rem' }}>
-                            {p.paymentMethod === 'Cheque' ? (
-                              <>
-                                <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{p.bank || '—'}</div>
-                                {(p.chequeNumber || p.slipNumber) && (
-                                  <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
-                                    Ref: {p.chequeNumber || p.slipNumber}
-                                  </div>
-                                )}
-                                {p.dueDate && (
-                                  <div style={{ color: new Date(p.dueDate) < new Date() && p.status === 'Uncollected' ? 'var(--danger)' : 'var(--text-muted)', fontSize: '0.7rem' }}>
-                                    Due: {formatDate(p.dueDate)}
-                                  </div>
-                                )}
-                              </>
-                            ) : (
-                              <span style={{ color: 'var(--text-muted)' }}>—</span>
+                          </div>
+                        </div>
+                        {p.paymentMethod === 'Cheque' && (p.bank || p.chequeNumber || p.slipNumber) && (
+                          <>
+                            <div>
+                              <div className="gen-mobile-card-label">Bank</div>
+                              <div className="gen-mobile-card-value">{p.bank || '—'}</div>
+                            </div>
+                            {(p.chequeNumber || p.slipNumber) && (
+                              <div>
+                                <div className="gen-mobile-card-label">Ref</div>
+                                <div className="gen-mobile-card-value">{p.chequeNumber || p.slipNumber}</div>
+                              </div>
                             )}
-                          </td>
-                          <td style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 700 }}>
-                            {formatCurrency(p.amount)}
-                          </td>
-                          <td style={{ padding: '0.75rem', textAlign: 'center' }}>
-                            <span style={{
-                              ...statusStyle,
-                              padding: '0.2rem 0.5rem',
-                              borderRadius: '4px',
-                              fontSize: '0.75rem',
-                              fontWeight: 600
-                            }}>
-                              {p.status}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
+                          </>
+                        )}
+                        {p.paymentMethod === 'Cheque' && p.dueDate && (
+                          <div>
+                            <div className="gen-mobile-card-label">Due Date</div>
+                            <div className="gen-mobile-card-value" style={{ color: new Date(p.dueDate) < new Date() && p.status === 'Uncollected' ? 'var(--danger)' : undefined }}>
+                              {formatDate(p.dueDate)}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="tbl-desktop">
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style={{ padding: '0.85rem 0.75rem', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('receivedDate')}>
+                        Received <SortIcon column="receivedDate" />
+                      </th>
+                      <th style={{ padding: '0.85rem 0.75rem' }}>Invoice</th>
+                      <th style={{ padding: '0.85rem 0.75rem', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('customer')}>
+                        Customer <SortIcon column="customer" />
+                      </th>
+                      <th style={{ padding: '0.85rem 0.75rem', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('method')}>
+                        Method <SortIcon column="method" />
+                      </th>
+                      <th style={{ padding: '0.85rem 0.75rem', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('bank')}>
+                        Bank / Reference <SortIcon column="bank" />
+                      </th>
+                      <th style={{ padding: '0.85rem 0.75rem', textAlign: 'right', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('amount')}>
+                        Amount <SortIcon column="amount" />
+                      </th>
+                      <th style={{ padding: '0.85rem 0.75rem', textAlign: 'center', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('status')}>
+                        Status <SortIcon column="status" />
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedPayments.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                          No payments match your filters.
+                        </td>
+                      </tr>
+                    ) : (
+                      paginatedPayments.map((p) => {
+                        const statusStyle = getStatusStyle(p.status);
+                        return (
+                          <tr key={p.id} className="hover-row" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.85rem' }}>
+                            <td style={{ padding: '0.75rem' }}>{formatDate(p.receivedDate)}</td>
+                            <td style={{ padding: '0.75rem' }}>
+                              <Link
+                                href={`/invoices/${p.invoice?.id}`}
+                                style={{ color: 'var(--accent-hover)', textDecoration: 'none', fontWeight: 600 }}
+                              >
+                                {p.invoice?.invoiceNumber || '—'}
+                              </Link>
+                            </td>
+                            <td style={{ padding: '0.75rem' }}>{p.invoice?.customer?.customerName || '—'}</td>
+                            <td style={{ padding: '0.75rem' }}>
+                              <span style={{ padding: '0.2rem 0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', fontSize: '0.75rem' }}>
+                                {p.paymentMethod}
+                              </span>
+                            </td>
+                            <td style={{ padding: '0.75rem' }}>
+                              {p.paymentMethod === 'Cheque' ? (
+                                <>
+                                  <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{p.bank || '—'}</div>
+                                  {(p.chequeNumber || p.slipNumber) && (
+                                    <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+                                      Ref: {p.chequeNumber || p.slipNumber}
+                                    </div>
+                                  )}
+                                  {p.dueDate && (
+                                    <div style={{ color: new Date(p.dueDate) < new Date() && p.status === 'Uncollected' ? 'var(--danger)' : 'var(--text-muted)', fontSize: '0.7rem' }}>
+                                      Due: {formatDate(p.dueDate)}
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <span style={{ color: 'var(--text-muted)' }}>—</span>
+                              )}
+                            </td>
+                            <td style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 700 }}>
+                              {formatCurrency(p.amount)}
+                            </td>
+                            <td style={{ padding: '0.75rem', textAlign: 'center' }}>
+                              <span style={{
+                                ...statusStyle,
+                                padding: '0.2rem 0.5rem',
+                                borderRadius: '4px',
+                                fontSize: '0.75rem',
+                                fontWeight: 600
+                              }}>
+                                {p.status}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {sortedPayments.length > 0 && (

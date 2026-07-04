@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Sidebar from '../components/Sidebar';
 import TopNav from '../components/TopNav';
 import ChatBotWrapper from '../components/ChatBotWrapper';
+import GlobalSearchWrapper from '../components/GlobalSearchWrapper';
 import PushManager from '../components/PushManager';
 import ApiFetchInterceptor from '../components/ApiFetchInterceptor';
 import SettingsProviderWrapper from '../components/SettingsProviderWrapper';
@@ -42,6 +43,7 @@ export default function RootLayout({
             </main>
           </div>
           <ChatBotWrapper />
+          <GlobalSearchWrapper />
         </SettingsProviderWrapper>
       </body>
     </html>

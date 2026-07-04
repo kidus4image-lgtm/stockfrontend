@@ -448,7 +448,7 @@ function InventoryContent() {
   return (
     <div className="dashboard-container">
       {/* HEADER SECTION */}
-      <header className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+      <header className="no-print gen-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
         <div>
           <h1 className="text-gradient" style={{ fontSize: '1.75rem', margin: 0 }}>Inventory</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: '0.15rem 0 0 0' }}>Batch tracking, valuations, and stock adjustments</p>
@@ -524,7 +524,7 @@ function InventoryContent() {
       {/* --- TAB CONTENT: PRODUCTS DIRECTORY --- */}
       {activeTabParam === 'products' && (
         <div className="glass-panel" style={{ padding: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', gap: '1rem' }}>
+          <div className="gen-page-filters" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', gap: '1rem' }}>
             <h2 className="text-gradient" style={{ fontSize: '1.1rem', margin: 0 }}>Products Catalog</h2>
             <input
               type="text"
@@ -536,128 +536,166 @@ function InventoryContent() {
              />
            </div>
 
-           <div className="table-wrap">
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>PRODUCT & SKU</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>PRICE</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>UNITS</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>BATCHES</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>AVAIL. STOCK</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>LIST</th>
-                  <th style={{ padding: '0.5rem 0.4rem', textAlign: 'right' }}>ACTIONS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.slice((productPage - 1) * rowsPerPage, productPage * rowsPerPage).map(p => {
-                    const availStock = p.availableStock ?? p.totalStock;
-                    const isLowStock = availStock <= p.minStock;
-                    const isOutOfStock = availStock === 0;
-                    const hasReserved = p.totalStock > availStock;
+           <div className="tbl-mobile">
+             {filteredProducts.length > 0 ? (
+               filteredProducts.slice((productPage - 1) * rowsPerPage, productPage * rowsPerPage).map(p => {
+                 const availStock = p.availableStock ?? p.totalStock;
+                 const isLowStock = availStock <= p.minStock;
+                 const isOutOfStock = availStock === 0;
 
-                    return (
-                      <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.8rem' }}>
-                        <td style={{ padding: '0.6rem 0.4rem' }}>
-                          <Link href={`/inventory/${p.id}`} style={{ color: 'var(--accent-hover)', textDecoration: 'none' }}>
-                            <strong style={{ color: 'inherit' }}>{p.name}</strong>
-                          </Link>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '0.1rem 0.3rem', borderRadius: '3px', marginLeft: '0.3rem' }}>
-                            {p.sku}
-                          </span>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                          ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem' }}>
-                          <span style={{ background: 'rgba(99,102,241,0.15)', color: '#a5b4fc', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 600 }}>
-                            {p.purchaseUnit || 'Unit'}
-                          </span>
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem', margin: '0 0.15rem' }}>→</span>
-                          <span style={{ background: 'rgba(16,185,129,0.15)', color: '#6ee7b7', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 600 }}>
-                            {p.sellingUnit || 'Unit'}
-                          </span>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem' }}>
-                          <span style={{ color: '#fff', background: 'rgba(255,255,255,0.05)', padding: '0.15rem 0.5rem', borderRadius: '8px', fontSize: '0.7rem' }}>
-                            {p.batchCount}
-                          </span>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-                            <span style={{
-                              padding: '0.15rem 0.5rem',
-                              borderRadius: '10px',
-                              fontSize: '0.7rem',
-                              fontWeight: 600,
-                              background: isOutOfStock ? 'rgba(239, 68, 68, 0.1)' : isLowStock ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-                              color: isOutOfStock ? '#fca5a5' : isLowStock ? '#fde047' : '#a7f3d0',
-                              border: `1px solid ${isOutOfStock ? 'rgba(239,68,68,0.2)' : isLowStock ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}`
-                            }}>
-                              {isOutOfStock ? 'OUT' : isLowStock ? `LOW (${availStock})` : availStock}
-                            </span>
-                            {hasReserved && (
-                              <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>
-                                {p.totalStock} total · {p.totalStock - availStock} reserved
-                              </span>
-                            )}
-                            {(p.conversionFactor || 1) > 1 && availStock > 0 && (
-                              <span style={{ fontSize: '0.6rem', color: '#6ee7b7' }}>
-                                ~{(availStock * (p.conversionFactor || 1)).toLocaleString()} {p.sellingUnit || 'Unit'}
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', textAlign: 'center' }}>
-                          <input
-                            type="checkbox"
-                            checked={p.showOnPriceList !== false}
-                            onChange={() => handleToggleShowOnPriceList(p.id, p.showOnPriceList !== false)}
-                            style={{ width: '1rem', height: '1rem', cursor: 'pointer', accentColor: '#174f49' }}
-                          />
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', textAlign: 'right' }}>
-                          <div style={{ display: 'inline-flex', gap: '0.25rem' }}>
-                            {canManageInventory && (
-                              <>
-                                <button className="btn-secondary" onClick={() => handleOpenAddBatch(p.id)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)' }}>+Batch</button>
-                                <button className="btn-secondary" onClick={() => handleOpenAdjustment(p.id)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)', color: '#f59e0b' }}>Adjust</button>
-                                <button className="btn-secondary" onClick={() => handleOpenEditProduct(p)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)' }}>Edit</button>
-                                <button className="btn-secondary" onClick={() => handleDeleteProduct(p.id, p.name)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(239,68,68,0.15)', color: '#ef4444' }}>Del</button>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={7} style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                      No products found matching your search.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-            {filteredProducts.length > rowsPerPage && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', marginTop: '0.6rem' }}>
-                <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={productPage === 1} onClick={() => setProductPage(p => Math.max(1, p - 1))}>← Prev</button>
-                <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', padding: '0 0.4rem' }}>
-                  {productPage} / {Math.ceil(filteredProducts.length / rowsPerPage)}
-                </span>
-                <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={productPage >= Math.ceil(filteredProducts.length / rowsPerPage)} onClick={() => setProductPage(p => p + 1)}>Next →</button>
-              </div>
-            )}
-          </div>
+                 return (
+                   <div className="gen-mobile-card" key={p.id}>
+                     <div className="gen-mobile-card-header">
+                       <Link href={`/inventory/${p.id}`} className="gen-mobile-card-title" style={{ color: 'var(--accent-hover)', textDecoration: 'none' }}>{p.name}</Link>
+                       <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '0.1rem 0.3rem', borderRadius: '3px' }}>{p.sku}</span>
+                     </div>
+                     <div className="gen-mobile-card-body">
+                       <div><span className="gen-mobile-card-label">Price</span><span className="gen-mobile-card-value">${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
+                       <div><span className="gen-mobile-card-label">Stock</span><span className="gen-mobile-card-value" style={{ color: isOutOfStock ? '#fca5a5' : isLowStock ? '#fde047' : '#a7f3d0' }}>{isOutOfStock ? 'OUT' : isLowStock ? `LOW (${availStock})` : availStock}</span></div>
+                       <div><span className="gen-mobile-card-label">Units</span><span className="gen-mobile-card-value">{p.purchaseUnit || 'Unit'} → {p.sellingUnit || 'Unit'}</span></div>
+                       <div><span className="gen-mobile-card-label">Batches</span><span className="gen-mobile-card-value">{p.batchCount}</span></div>
+                       <div><span className="gen-mobile-card-label">List</span><span className="gen-mobile-card-value">{p.showOnPriceList !== false ? 'Yes' : 'No'}</span></div>
+                     </div>
+                     {canManageInventory && (
+                       <div className="gen-mobile-card-actions">
+                         <button className="btn-secondary" onClick={() => handleOpenAddBatch(p.id)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)' }}>+Batch</button>
+                         <button className="btn-secondary" onClick={() => handleOpenAdjustment(p.id)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)', color: '#f59e0b' }}>Adjust</button>
+                         <button className="btn-secondary" onClick={() => handleOpenEditProduct(p)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)' }}>Edit</button>
+                         <button className="btn-secondary" onClick={() => handleDeleteProduct(p.id, p.name)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(239,68,68,0.15)', color: '#ef4444' }}>Del</button>
+                       </div>
+                     )}
+                   </div>
+                 );
+               })
+             ) : (
+               <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>No products found matching your search.</div>
+             )}
+           </div>
+
+           <div className="tbl-desktop">
+             <div className="table-wrap">
+               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                 <thead>
+                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>PRODUCT & SKU</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>PRICE</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>UNITS</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>BATCHES</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>AVAIL. STOCK</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>LIST</th>
+                     <th style={{ padding: '0.5rem 0.4rem', textAlign: 'right' }}>ACTIONS</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {filteredProducts.length > 0 ? (
+                     filteredProducts.slice((productPage - 1) * rowsPerPage, productPage * rowsPerPage).map(p => {
+                       const availStock = p.availableStock ?? p.totalStock;
+                       const isLowStock = availStock <= p.minStock;
+                       const isOutOfStock = availStock === 0;
+                       const hasReserved = p.totalStock > availStock;
+
+                       return (
+                         <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.8rem' }}>
+                           <td style={{ padding: '0.6rem 0.4rem' }}>
+                             <Link href={`/inventory/${p.id}`} style={{ color: 'var(--accent-hover)', textDecoration: 'none' }}>
+                               <strong style={{ color: 'inherit' }}>{p.name}</strong>
+                             </Link>
+                             <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '0.1rem 0.3rem', borderRadius: '3px', marginLeft: '0.3rem' }}>
+                               {p.sku}
+                             </span>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                             ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem' }}>
+                             <span style={{ background: 'rgba(99,102,241,0.15)', color: '#a5b4fc', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 600 }}>
+                               {p.purchaseUnit || 'Unit'}
+                             </span>
+                             <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem', margin: '0 0.15rem' }}>→</span>
+                             <span style={{ background: 'rgba(16,185,129,0.15)', color: '#6ee7b7', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 600 }}>
+                               {p.sellingUnit || 'Unit'}
+                             </span>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem' }}>
+                             <span style={{ color: '#fff', background: 'rgba(255,255,255,0.05)', padding: '0.15rem 0.5rem', borderRadius: '8px', fontSize: '0.7rem' }}>
+                               {p.batchCount}
+                             </span>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem' }}>
+                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                               <span style={{
+                                 padding: '0.15rem 0.5rem',
+                                 borderRadius: '10px',
+                                 fontSize: '0.7rem',
+                                 fontWeight: 600,
+                                 background: isOutOfStock ? 'rgba(239, 68, 68, 0.1)' : isLowStock ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                                 color: isOutOfStock ? '#fca5a5' : isLowStock ? '#fde047' : '#a7f3d0',
+                                 border: `1px solid ${isOutOfStock ? 'rgba(239,68,68,0.2)' : isLowStock ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}`
+                               }}>
+                                 {isOutOfStock ? 'OUT' : isLowStock ? `LOW (${availStock})` : availStock}
+                               </span>
+                               {hasReserved && (
+                                 <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>
+                                   {p.totalStock} total · {p.totalStock - availStock} reserved
+                                 </span>
+                               )}
+                               {(p.conversionFactor || 1) > 1 && availStock > 0 && (
+                                 <span style={{ fontSize: '0.6rem', color: '#6ee7b7' }}>
+                                   ~{(availStock * (p.conversionFactor || 1)).toLocaleString()} {p.sellingUnit || 'Unit'}
+                                 </span>
+                               )}
+                             </div>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', textAlign: 'center' }}>
+                             <input
+                               type="checkbox"
+                               checked={p.showOnPriceList !== false}
+                               onChange={() => handleToggleShowOnPriceList(p.id, p.showOnPriceList !== false)}
+                               style={{ width: '1rem', height: '1rem', cursor: 'pointer', accentColor: '#174f49' }}
+                             />
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', textAlign: 'right' }}>
+                             <div style={{ display: 'inline-flex', gap: '0.25rem' }}>
+                               {canManageInventory && (
+                                 <>
+                                   <button className="btn-secondary" onClick={() => handleOpenAddBatch(p.id)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)' }}>+Batch</button>
+                                   <button className="btn-secondary" onClick={() => handleOpenAdjustment(p.id)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)', color: '#f59e0b' }}>Adjust</button>
+                                   <button className="btn-secondary" onClick={() => handleOpenEditProduct(p)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)' }}>Edit</button>
+                                   <button className="btn-secondary" onClick={() => handleDeleteProduct(p.id, p.name)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(239,68,68,0.15)', color: '#ef4444' }}>Del</button>
+                                 </>
+                               )}
+                             </div>
+                           </td>
+                         </tr>
+                       );
+                     })
+                   ) : (
+                     <tr>
+                       <td colSpan={7} style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                         No products found matching your search.
+                       </td>
+                     </tr>
+                   )}
+                 </tbody>
+               </table>
+               {filteredProducts.length > rowsPerPage && (
+                 <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', marginTop: '0.6rem' }}>
+                   <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={productPage === 1} onClick={() => setProductPage(p => Math.max(1, p - 1))}>← Prev</button>
+                   <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', padding: '0 0.4rem' }}>
+                     {productPage} / {Math.ceil(filteredProducts.length / rowsPerPage)}
+                   </span>
+                   <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={productPage >= Math.ceil(filteredProducts.length / rowsPerPage)} onClick={() => setProductPage(p => p + 1)}>Next →</button>
+                 </div>
+               )}
+             </div>
+           </div>
         </div>
       )}
 
       {/* --- TAB CONTENT: BATCHES LEDGER --- */}
       {activeTabParam === 'batches' && (
         <div className="glass-panel" style={{ padding: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', gap: '1rem' }}>
+          <div className="gen-page-filters" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', gap: '1rem' }}>
             <h2 className="text-gradient" style={{ fontSize: '1.1rem', margin: 0 }}>Batches Ledger</h2>
             <input
               type="text"
@@ -669,90 +707,124 @@ function InventoryContent() {
             />
           </div>
 
-          <div className="table-wrap">
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>BATCH</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>PRODUCT</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>UNIT COST</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>INITIAL</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>REMAINING</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>EXPIRY</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>RECEIVED</th>
-                  <th style={{ padding: '0.5rem 0.4rem', textAlign: 'right' }}>ACTIONS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredBatches.length > 0 ? (
-                  filteredBatches.slice((batchPage - 1) * rowsPerPage, batchPage * rowsPerPage).map(b => {
-                    const isExpired = b.expiryDate && new Date(b.expiryDate) < new Date();
-                    const isSoonExpiring = b.expiryDate && !isExpired && new Date(b.expiryDate).getTime() - new Date().getTime() < 30 * 24 * 60 * 60 * 1000;
+           <div className="tbl-mobile">
+             {filteredBatches.length > 0 ? (
+               filteredBatches.slice((batchPage - 1) * rowsPerPage, batchPage * rowsPerPage).map(b => {
+                 const isExpired = b.expiryDate && new Date(b.expiryDate) < new Date();
+                 const isSoonExpiring = b.expiryDate && !isExpired && new Date(b.expiryDate).getTime() - new Date().getTime() < 30 * 24 * 60 * 60 * 1000;
 
-                    return (
-                      <tr key={b.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.8rem' }}>
-                        <td style={{ padding: '0.6rem 0.4rem' }}>
-                          <strong style={{ color: 'var(--text-main)' }}>{b.batchNumber}</strong>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem' }}>
-                          <strong style={{ color: 'var(--text-main)' }}>{b.product?.name}</strong>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginLeft: '0.3rem' }}>{b.product?.sku}</span>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                          ${b.purchasePrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', color: 'var(--text-muted)' }}>
-                          {b.initialQuantity}
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem' }}>
-                          <strong style={{ color: b.quantity === 0 ? 'var(--danger)' : '#fff' }}>{b.quantity}</strong>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem' }}>
-                          {b.expiryDate ? (
-                            <span style={{ color: isExpired ? '#fca5a5' : isSoonExpiring ? '#fde047' : 'var(--text-muted)', fontWeight: (isExpired || isSoonExpiring) ? 'bold' : 'normal', fontSize: '0.7rem' }}>
-                              {new Date(b.expiryDate).toLocaleDateString()}
-                            </span>
-                          ) : (
-                            <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '0.7rem' }}>N/A</span>
-                          )}
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
-                          {new Date(b.receivedDate).toLocaleDateString()}
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', textAlign: 'right' }}>
-                          {canManageInventory && b.quantity > 0 && (
-                            <button className="btn-secondary" onClick={() => handleOpenAdjustment(b.productId, b.id)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)', color: '#f59e0b' }}>Adjust</button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={8} style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                      No batches registered or found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-            {filteredBatches.length > rowsPerPage && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', marginTop: '0.6rem' }}>
-                <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={batchPage === 1} onClick={() => setBatchPage(p => Math.max(1, p - 1))}>← Prev</button>
-                <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', padding: '0 0.4rem' }}>
-                  {batchPage} / {Math.ceil(filteredBatches.length / rowsPerPage)}
-                </span>
-                <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={batchPage >= Math.ceil(filteredBatches.length / rowsPerPage)} onClick={() => setBatchPage(p => p + 1)}>Next →</button>
-              </div>
-            )}
-          </div>
+                 return (
+                   <div className="gen-mobile-card" key={b.id}>
+                     <div className="gen-mobile-card-header">
+                       <span className="gen-mobile-card-title">{b.batchNumber}</span>
+                       <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{b.product?.sku}</span>
+                     </div>
+                     <div className="gen-mobile-card-body">
+                       <div><span className="gen-mobile-card-label">Product</span><span className="gen-mobile-card-value">{b.product?.name}</span></div>
+                       <div><span className="gen-mobile-card-label">Unit Cost</span><span className="gen-mobile-card-value">${b.purchasePrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
+                       <div><span className="gen-mobile-card-label">Stock</span><span className="gen-mobile-card-value" style={{ color: b.quantity === 0 ? '#ef4444' : '#fff' }}>{b.quantity} / {b.initialQuantity}</span></div>
+                       <div><span className="gen-mobile-card-label">Expiry</span><span className="gen-mobile-card-value" style={{ color: isExpired ? '#fca5a5' : isSoonExpiring ? '#fde047' : 'var(--text-muted)' }}>{b.expiryDate ? new Date(b.expiryDate).toLocaleDateString() : 'N/A'}</span></div>
+                       <div><span className="gen-mobile-card-label">Received</span><span className="gen-mobile-card-value">{new Date(b.receivedDate).toLocaleDateString()}</span></div>
+                     </div>
+                     {canManageInventory && b.quantity > 0 && (
+                       <div className="gen-mobile-card-actions">
+                         <button className="btn-secondary" onClick={() => handleOpenAdjustment(b.productId, b.id)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)', color: '#f59e0b' }}>Adjust</button>
+                       </div>
+                     )}
+                   </div>
+                 );
+               })
+             ) : (
+               <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>No batches registered or found.</div>
+             )}
+           </div>
+
+           <div className="tbl-desktop">
+             <div className="table-wrap">
+               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                 <thead>
+                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>BATCH</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>PRODUCT</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>UNIT COST</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>INITIAL</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>REMAINING</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>EXPIRY</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>RECEIVED</th>
+                     <th style={{ padding: '0.5rem 0.4rem', textAlign: 'right' }}>ACTIONS</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {filteredBatches.length > 0 ? (
+                     filteredBatches.slice((batchPage - 1) * rowsPerPage, batchPage * rowsPerPage).map(b => {
+                       const isExpired = b.expiryDate && new Date(b.expiryDate) < new Date();
+                       const isSoonExpiring = b.expiryDate && !isExpired && new Date(b.expiryDate).getTime() - new Date().getTime() < 30 * 24 * 60 * 60 * 1000;
+
+                       return (
+                         <tr key={b.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.8rem' }}>
+                           <td style={{ padding: '0.6rem 0.4rem' }}>
+                             <strong style={{ color: 'var(--text-main)' }}>{b.batchNumber}</strong>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem' }}>
+                             <strong style={{ color: 'var(--text-main)' }}>{b.product?.name}</strong>
+                             <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginLeft: '0.3rem' }}>{b.product?.sku}</span>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                             ${b.purchasePrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', color: 'var(--text-muted)' }}>
+                             {b.initialQuantity}
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem' }}>
+                             <strong style={{ color: b.quantity === 0 ? 'var(--danger)' : '#fff' }}>{b.quantity}</strong>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem' }}>
+                             {b.expiryDate ? (
+                               <span style={{ color: isExpired ? '#fca5a5' : isSoonExpiring ? '#fde047' : 'var(--text-muted)', fontWeight: (isExpired || isSoonExpiring) ? 'bold' : 'normal', fontSize: '0.7rem' }}>
+                                 {new Date(b.expiryDate).toLocaleDateString()}
+                               </span>
+                             ) : (
+                               <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '0.7rem' }}>N/A</span>
+                             )}
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+                             {new Date(b.receivedDate).toLocaleDateString()}
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', textAlign: 'right' }}>
+                             {canManageInventory && b.quantity > 0 && (
+                               <button className="btn-secondary" onClick={() => handleOpenAdjustment(b.productId, b.id)} style={{ padding: '0.2rem 0.45rem', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.1)', color: '#f59e0b' }}>Adjust</button>
+                             )}
+                           </td>
+                         </tr>
+                       );
+                     })
+                   ) : (
+                     <tr>
+                       <td colSpan={8} style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                         No batches registered or found.
+                       </td>
+                     </tr>
+                   )}
+                 </tbody>
+               </table>
+               {filteredBatches.length > rowsPerPage && (
+                 <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', marginTop: '0.6rem' }}>
+                   <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={batchPage === 1} onClick={() => setBatchPage(p => Math.max(1, p - 1))}>← Prev</button>
+                   <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', padding: '0 0.4rem' }}>
+                     {batchPage} / {Math.ceil(filteredBatches.length / rowsPerPage)}
+                   </span>
+                   <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={batchPage >= Math.ceil(filteredBatches.length / rowsPerPage)} onClick={() => setBatchPage(p => p + 1)}>Next →</button>
+                 </div>
+               )}
+             </div>
+           </div>
         </div>
       )}
 
       {/* --- TAB CONTENT: AUDIT LOGS --- */}
       {activeTabParam === 'adjustments' && (
         <div className="glass-panel" style={{ padding: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', gap: '1rem' }}>
+          <div className="gen-page-filters" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', gap: '1rem' }}>
             <h2 className="text-gradient" style={{ fontSize: '1.1rem', margin: 0 }}>Audit Logs</h2>
             <input
               type="text"
@@ -764,75 +836,102 @@ function InventoryContent() {
             />
           </div>
 
-          <div className="table-wrap">
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>TIMESTAMP</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>PRODUCT</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>BATCH</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>TYPE</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>UNITS</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>REASON</th>
-                  <th style={{ padding: '0.5rem 0.4rem' }}>AUDITED BY</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredAdjustments.length > 0 ? (
-                  filteredAdjustments.slice((adjustmentPage - 1) * rowsPerPage, adjustmentPage * rowsPerPage).map(a => {
-                    const isAddition = a.adjustmentType === 'Addition';
-                    return (
-                      <tr key={a.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.8rem' }}>
-                        <td style={{ padding: '0.6rem 0.4rem', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
-                          {new Date(a.createdAt).toLocaleString()}
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem' }}>
-                          <strong style={{ color: 'var(--text-main)' }}>{a.product?.name}</strong>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', fontSize: '0.7rem' }}>
-                          <strong style={{ color: 'var(--text-main)' }}>{a.batch?.batchNumber || 'FIFO'}</strong>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem' }}>
-                          <span style={{ padding: '0.15rem 0.5rem', borderRadius: '8px', fontSize: '0.65rem', fontWeight: 'bold',
-                            background: isAddition ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                            color: isAddition ? '#a7f3d0' : '#fca5a5'
-                          }}>
-                            {isAddition ? 'IN' : 'OUT'}
-                          </span>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', fontWeight: 600 }}>
-                          <span style={{ color: isAddition ? 'var(--success)' : 'var(--danger)' }}>
-                            {isAddition ? `+${a.quantityChanged}` : `-${a.quantityChanged}`}
-                          </span>
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', color: 'var(--text-main)', fontSize: '0.75rem' }}>
-                          {a.reason}
-                        </td>
-                        <td style={{ padding: '0.6rem 0.4rem', fontWeight: 'bold', color: 'var(--accent-hover)', fontSize: '0.7rem' }}>
-                          {a.adjustedBy}
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={7} style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                      No adjustment entries recorded in log.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-            {filteredAdjustments.length > rowsPerPage && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', marginTop: '0.6rem' }}>
-                <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={adjustmentPage === 1} onClick={() => setAdjustmentPage(p => Math.max(1, p - 1))}>← Prev</button>
-                <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', padding: '0 0.4rem' }}>
-                  {adjustmentPage} / {Math.ceil(filteredAdjustments.length / rowsPerPage)}
-                </span>
-                <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={adjustmentPage >= Math.ceil(filteredAdjustments.length / rowsPerPage)} onClick={() => setAdjustmentPage(p => p + 1)}>Next →</button>
-              </div>
-            )}
-          </div>
+           <div className="tbl-mobile">
+             {filteredAdjustments.length > 0 ? (
+               filteredAdjustments.slice((adjustmentPage - 1) * rowsPerPage, adjustmentPage * rowsPerPage).map(a => {
+                 const isAddition = a.adjustmentType === 'Addition';
+                 return (
+                   <div className="gen-mobile-card" key={a.id}>
+                     <div className="gen-mobile-card-header">
+                       <span className="gen-mobile-card-title">{a.product?.name}</span>
+                       <span style={{ fontSize: '0.65rem', padding: '0.15rem 0.5rem', borderRadius: '8px', fontWeight: 'bold', background: isAddition ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: isAddition ? '#a7f3d0' : '#fca5a5' }}>{isAddition ? 'IN' : 'OUT'}</span>
+                     </div>
+                     <div className="gen-mobile-card-body">
+                       <div><span className="gen-mobile-card-label">Timestamp</span><span className="gen-mobile-card-value" style={{ fontSize: '0.7rem' }}>{new Date(a.createdAt).toLocaleString()}</span></div>
+                       <div><span className="gen-mobile-card-label">Batch</span><span className="gen-mobile-card-value">{a.batch?.batchNumber || 'FIFO'}</span></div>
+                       <div><span className="gen-mobile-card-label">Quantity</span><span className="gen-mobile-card-value" style={{ color: isAddition ? '#10b981' : '#ef4444', fontWeight: 600 }}>{isAddition ? `+${a.quantityChanged}` : `-${a.quantityChanged}`}</span></div>
+                       <div><span className="gen-mobile-card-label">Reason</span><span className="gen-mobile-card-value">{a.reason}</span></div>
+                       <div><span className="gen-mobile-card-label">Audited By</span><span className="gen-mobile-card-value" style={{ color: 'var(--accent-hover)' }}>{a.adjustedBy}</span></div>
+                     </div>
+                   </div>
+                 );
+               })
+             ) : (
+               <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>No adjustment entries recorded in log.</div>
+             )}
+           </div>
+
+           <div className="tbl-desktop">
+             <div className="table-wrap">
+               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                 <thead>
+                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>TIMESTAMP</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>PRODUCT</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>BATCH</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>TYPE</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>UNITS</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>REASON</th>
+                     <th style={{ padding: '0.5rem 0.4rem' }}>AUDITED BY</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {filteredAdjustments.length > 0 ? (
+                     filteredAdjustments.slice((adjustmentPage - 1) * rowsPerPage, adjustmentPage * rowsPerPage).map(a => {
+                       const isAddition = a.adjustmentType === 'Addition';
+                       return (
+                         <tr key={a.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.8rem' }}>
+                           <td style={{ padding: '0.6rem 0.4rem', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+                             {new Date(a.createdAt).toLocaleString()}
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem' }}>
+                             <strong style={{ color: 'var(--text-main)' }}>{a.product?.name}</strong>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', fontSize: '0.7rem' }}>
+                             <strong style={{ color: 'var(--text-main)' }}>{a.batch?.batchNumber || 'FIFO'}</strong>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem' }}>
+                             <span style={{ padding: '0.15rem 0.5rem', borderRadius: '8px', fontSize: '0.65rem', fontWeight: 'bold',
+                               background: isAddition ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                               color: isAddition ? '#a7f3d0' : '#fca5a5'
+                             }}>
+                               {isAddition ? 'IN' : 'OUT'}
+                             </span>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', fontWeight: 600 }}>
+                             <span style={{ color: isAddition ? 'var(--success)' : 'var(--danger)' }}>
+                               {isAddition ? `+${a.quantityChanged}` : `-${a.quantityChanged}`}
+                             </span>
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', color: 'var(--text-main)', fontSize: '0.75rem' }}>
+                             {a.reason}
+                           </td>
+                           <td style={{ padding: '0.6rem 0.4rem', fontWeight: 'bold', color: 'var(--accent-hover)', fontSize: '0.7rem' }}>
+                             {a.adjustedBy}
+                           </td>
+                         </tr>
+                       );
+                     })
+                   ) : (
+                     <tr>
+                       <td colSpan={7} style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                         No adjustment entries recorded in log.
+                       </td>
+                     </tr>
+                   )}
+                 </tbody>
+               </table>
+               {filteredAdjustments.length > rowsPerPage && (
+                 <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', marginTop: '0.6rem' }}>
+                   <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={adjustmentPage === 1} onClick={() => setAdjustmentPage(p => Math.max(1, p - 1))}>← Prev</button>
+                   <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', padding: '0 0.4rem' }}>
+                     {adjustmentPage} / {Math.ceil(filteredAdjustments.length / rowsPerPage)}
+                   </span>
+                   <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={adjustmentPage >= Math.ceil(filteredAdjustments.length / rowsPerPage)} onClick={() => setAdjustmentPage(p => p + 1)}>Next →</button>
+                 </div>
+               )}
+             </div>
+           </div>
         </div>
       )}
 

@@ -209,7 +209,7 @@ export default function InvoicesListPage() {
 
   return (
     <div className="dashboard-container">
-      <header className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <header className="no-print gen-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
           <h1 className="text-gradient" style={{ fontSize: '2.5rem' }}>Sales Invoices Report</h1>
           <p style={{ color: 'var(--text-muted)' }}>Manage sales headers, track outstanding amounts, and generate reports.</p>
@@ -270,7 +270,7 @@ export default function InvoicesListPage() {
       </div>
 
       {/* PRIMARY FILTERS */}
-      <div className="glass-panel no-print" style={{ padding: '1.5rem', marginBottom: showAdvanced ? '0' : '2rem', borderBottomLeftRadius: showAdvanced ? 0 : undefined, borderBottomRightRadius: showAdvanced ? 0 : undefined, display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+      <div className="glass-panel no-print gen-page-filters" style={{ padding: '1.5rem', marginBottom: showAdvanced ? '0' : '2rem', borderBottomLeftRadius: showAdvanced ? 0 : undefined, borderBottomRightRadius: showAdvanced ? 0 : undefined, display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 240px' }}>
           <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.35rem' }}>Search</label>
           <input
@@ -389,6 +389,55 @@ export default function InvoicesListPage() {
         </div>
       ) : (
         <div className="glass-panel print-area" style={{ padding: '1rem', overflowX: 'auto' }}>
+          <div className="tbl-mobile">
+            {(() => {
+              const paginatedInvoices = filteredInvoices.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+              return paginatedInvoices.map((inv) => {
+                const sc = statusColor(inv.status);
+                return (
+                  <div className="gen-mobile-card" key={inv.id} onClick={() => router.push(`/invoices/${inv.id}`)} style={{ cursor: 'pointer' }}>
+                    <div className="gen-mobile-card-header">
+                      <span className="gen-mobile-card-title">{inv.invoiceNumber}</span>
+                      <span style={{ background: sc.bg, color: sc.color, padding: '0.15rem 0.5rem', borderRadius: '9999px', fontSize: '0.65rem', fontWeight: '600' }}>
+                        {inv.status === 'Overdue' ? 'Overdue' : inv.status === 'Critical' ? 'Critical' : inv.status}
+                      </span>
+                    </div>
+                    <div className="gen-mobile-card-body">
+                      <div>
+                        <div className="gen-mobile-card-label">Customer</div>
+                        <div className="gen-mobile-card-value">{inv.customer.customerName}</div>
+                      </div>
+                      <div>
+                        <div className="gen-mobile-card-label">Date</div>
+                        <div className="gen-mobile-card-value">{inv.invoiceDate ? new Date(inv.invoiceDate).toLocaleDateString() : '-'}</div>
+                      </div>
+                      <div>
+                        <div className="gen-mobile-card-label">Amount</div>
+                        <div className="gen-mobile-card-value">${inv.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                      </div>
+                      <div>
+                        <div className="gen-mobile-card-label">Remaining</div>
+                        <div className="gen-mobile-card-value" style={{ color: inv.remainingPayment > 0 ? 'var(--warning)' : 'var(--success)' }}>
+                          ${inv.remainingPayment.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </div>
+                      </div>
+                      {inv.salesRep && (
+                        <div>
+                          <div className="gen-mobile-card-label">Sales Rep</div>
+                          <div className="gen-mobile-card-value">{inv.salesRep.firstName} {inv.salesRep.lastName}</div>
+                        </div>
+                      )}
+                      <div>
+                        <div className="gen-mobile-card-label">Type</div>
+                        <div className="gen-mobile-card-value">{inv.salesType || 'Credit'}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              });
+            })()}
+          </div>
+          <div className="tbl-desktop">
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
@@ -474,6 +523,7 @@ export default function InvoicesListPage() {
               })()}
             </tbody>
           </table>
+          </div>
           
           {/* Pagination Controls */}
           {(() => {
