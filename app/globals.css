@@ -2173,29 +2173,64 @@ tr.hover-row:hover {
   }
   .order-items-header > button { width: 100%; justify-content: center; }
 
+  .price-list-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem;
+  }
+  .price-list-header > div:first-child h1 {
+    font-size: 1.5rem !important;
+  }
+  .price-list-header > div:last-child {
+    flex-direction: column;
+  }
+  .price-list-header > div:last-child > button {
+    width: 100%;
+    justify-content: center;
+  }
+  .price-list-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  .price-list-grid > div {
+    padding: 1.25rem !important;
+  }
+  .price-list-container {
+    padding: 1rem !important;
+  }
+  .price-list-export-modal {
+    min-width: 0 !important;
+    width: calc(100vw - 2rem) !important;
+    padding: 1.25rem !important;
+  }
+  .price-list-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .floating-btn {
     bottom: 4.5rem !important;
-    width: 50px !important;
-    height: 50px !important;
-    font-size: 1.3rem !important;
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 1.2rem !important;
   }
   .search-floating-btn {
     right: 1rem !important;
-    bottom: 5.75rem !important;
+    bottom: 4.5rem !important;
   }
   .chat-floating-btn {
     right: 1rem !important;
-    bottom: 11rem !important;
+    bottom: 7rem !important;
   }
   .chat-floating-panel {
-    bottom: 16.5rem !important;
+    bottom: 11.5rem !important;
   }
   .search-floating-panel {
-    bottom: 11.25rem !important;
+    bottom: 9.25rem !important;
   }
   .floating-panel {
     width: calc(100vw - 2rem) !important;
     right: 1rem !important;
-    max-height: 60vh !important;
+    max-height: 55vh !important;
   }
 }

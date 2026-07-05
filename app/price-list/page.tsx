@@ -235,11 +235,11 @@ export default function PriceListPage() {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+    <div className="price-list-container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       {showExportModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
           onClick={() => setShowExportModal(false)}>
-          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', minWidth: '380px', maxWidth: '90vw' }}
+          <div className="glass-panel price-list-export-modal" style={{ padding: '2rem', borderRadius: '16px', minWidth: '380px', maxWidth: '90vw' }}
             onClick={e => e.stopPropagation()}>
             <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.2rem', color: '#fff' }}>Choose Export Format</h3>
             <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
@@ -292,7 +292,7 @@ export default function PriceListPage() {
         <div style={{ position: 'absolute', top: '-20px', right: '-10px', fontSize: '8rem', opacity: 0.06, pointerEvents: 'none', transform: 'rotate(15deg)' }}>💊</div>
         <div style={{ position: 'absolute', bottom: '-10px', left: '30%', fontSize: '5rem', opacity: 0.04, pointerEvents: 'none', transform: 'rotate(-10deg)' }}>⚕️</div>
         <div style={{ position: 'absolute', top: '10px', right: '30%', fontSize: '3.5rem', opacity: 0.04, pointerEvents: 'none' }}>🏥</div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="price-list-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
               <span style={{ fontSize: '2rem' }}>📋</span>
@@ -332,7 +332,7 @@ export default function PriceListPage() {
           </div>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '2rem' }}>
+        <div className="price-list-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '2rem' }}>
 
           <div className="glass-panel" style={{ padding: '1.75rem', borderRadius: '16px', height: 'fit-content', border: `1px solid ${accentColor}33`, position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: '-15px', right: '-15px', fontSize: '5rem', opacity: 0.04, pointerEvents: 'none', transform: 'rotate(20deg)' }}>💊</div>
@@ -441,7 +441,7 @@ export default function PriceListPage() {
                 </button>
               </div>
             ) : (
-              <div className="table-wrap">
+              <div className="table-wrap price-list-table-wrap">
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: `2px solid ${accentColor}55`, color: accentColor, fontSize: '0.8rem' }}>
