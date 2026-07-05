@@ -142,7 +142,7 @@ export default function GlobalSearch() {
       {/* Floating Search Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="no-print"
+        className="no-print floating-btn search-floating-btn"
         aria-label="Search products, invoices, payments, orders and purchases"
         style={{
           position: 'fixed',
@@ -171,7 +171,7 @@ export default function GlobalSearch() {
       {/* Search Panel */}
       {isOpen && (
         <div
-          className="no-print"
+          className="no-print floating-panel search-floating-panel"
           style={{
             position: 'fixed',
             bottom: '6rem',

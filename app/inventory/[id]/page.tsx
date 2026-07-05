@@ -505,7 +505,7 @@ export default function ProductDetailPage() {
       {/* ADD BATCH MODAL */}
       {showAddBatch && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(12px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1.5rem' }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '800px', padding: '2.5rem', borderRadius: '20px', background: 'rgba(17, 24, 39, 0.98)', border: '1px solid rgba(255, 255, 255, 0.08)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)', position: 'relative' }}>
+          <div className="glass-panel inv-detail-modal">
             <button onClick={() => setShowAddBatch(false)} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
             <div style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '1rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>
@@ -547,7 +547,7 @@ export default function ProductDetailPage() {
       {/* ADJUST STOCK MODAL */}
       {showAdjustStock && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(12px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1.5rem' }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '800px', padding: '2.5rem', borderRadius: '20px', background: 'rgba(17, 24, 39, 0.98)', border: '1px solid rgba(255, 255, 255, 0.08)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)', position: 'relative' }}>
+          <div className="glass-panel inv-detail-modal">
             <button onClick={() => setShowAdjustStock(false)} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
             <div style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '1rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>
@@ -600,7 +600,7 @@ export default function ProductDetailPage() {
       {/* EDIT PRODUCT MODAL */}
       {showEditProduct && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(12px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1.5rem' }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '800px', padding: '2.5rem', borderRadius: '20px', background: 'rgba(17, 24, 39, 0.98)', border: '1px solid rgba(255, 255, 255, 0.08)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)', position: 'relative' }}>
+          <div className="glass-panel inv-detail-modal">
             <button onClick={() => setShowEditProduct(false)} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
             <div style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '1rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>

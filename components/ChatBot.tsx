@@ -206,7 +206,7 @@ export default function ChatBot() {
       {/* Floating Chat Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="no-print"
+        className="no-print floating-btn chat-floating-btn"
         style={{
           position: 'fixed',
           bottom: '2rem',
@@ -234,7 +234,7 @@ export default function ChatBot() {
       {/* Chat Panel */}
       {isOpen && (
         <div
-          className="no-print"
+          className="no-print floating-panel chat-floating-panel"
           style={{
             position: 'fixed',
             bottom: '6rem',

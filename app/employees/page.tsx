@@ -124,14 +124,21 @@ function EmployeesDirectory() {
     }
   };
 
+  const filteredEmployees = employees.filter(e =>
+    `${e.firstName} ${e.middleName} ${e.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    e.idNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const paginatedEmployees = filteredEmployees.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredEmployees.length / rowsPerPage));
+
   return (
-    <div className="dashboard-container">
-      <header className="page-header gen-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+    <div className="dashboard-container employee-page-shell">
+      <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexShrink: 0, flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 className="text-gradient" style={{ fontSize: '2.5rem' }}>Employee Directory</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Manage corporate personnel, departments, and monitor their linked customer portfolios.</p>
+          <h1 className="text-gradient" style={{ fontSize: '2.2rem', margin: 0, fontWeight: 800 }}>Employee Directory</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.15rem' }}>Manage corporate personnel, departments, and monitor their linked customer portfolios.</p>
         </div>
-        <button className="btn-primary" onClick={() => router.push('/employees/new')}>
+        <button className="btn-primary" onClick={() => router.push('/employees/new')} style={{ padding: '0.6rem 1.25rem' }}>
           + Register Employee
         </button>
       </header>
@@ -145,173 +152,169 @@ function EmployeesDirectory() {
           No employees registered. Create a profile to begin.
         </div>
       ) : (
-        <div className="employee-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2.5rem' }}>
-          
+        <div className="employee-grid" style={{ flex: 1, minHeight: 0 }}>
+
           {/* Employee List */}
-          <div className="glass-panel employee-list-panel" style={{ padding: '1rem', overflowX: 'auto', alignSelf: 'start' }}>
-            <div className="gen-page-filters" style={{ marginBottom: '1rem' }}>
-              <input 
-                type="text" 
-                placeholder="Search employees by name or ID..." 
-                className="form-control" 
-                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px' }}
+          <div className="glass-panel employee-list-panel" style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ marginBottom: '1rem', flexShrink: 0 }}>
+              <input
+                type="text"
+                placeholder="Search employees by name or ID..."
+                className="form-control"
+                style={{ width: '100%', padding: '0.65rem 1rem', borderRadius: '8px' }}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="tbl-mobile">
-              {(() => {
-                const filteredEmployees = employees.filter(e => 
-                  `${e.firstName} ${e.middleName} ${e.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                  e.idNumber.toLowerCase().includes(searchQuery.toLowerCase())
-                );
-                const paginatedEmployees = filteredEmployees.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                return paginatedEmployees.map((emp) => (
+
+            {/* Mobile card list - always visible on mobile */}
+            <div className="customer-mobile-search-results">
+              {paginatedEmployees.length === 0 ? (
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '1.5rem' }}>
+                  {searchQuery ? 'No employees match your search.' : 'No employees found.'}
+                </p>
+              ) : (
+                paginatedEmployees.map((emp) => (
                   <div
                     key={emp.id}
-                    className="gen-mobile-card"
+                    className="customer-mobile-search-item"
                     onClick={() => handleSelectEmployee(emp)}
                   >
-                    <div className="gen-mobile-card-header">
-                      <span className="gen-mobile-card-title">{emp.firstName} {emp.middleName} {emp.lastName}</span>
-                      <span className="gen-mobile-card-label">{emp.department?.departmentName || '-'}</span>
+                    <div>
+                      <span
+                        style={{ fontWeight: '700', color: 'var(--accent-hover)', cursor: 'pointer', textDecoration: 'underline' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/employees?id=${emp.id}`);
+                        }}
+                      >
+                        {emp.firstName} {emp.middleName} {emp.lastName}
+                      </span>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                        ID: {emp.idNumber}
+                        {emp.department ? ` · ${emp.department.departmentName}` : ''}
+                      </div>
                     </div>
-                    <div className="gen-mobile-card-body">
-                      <div>
-                        <span className="gen-mobile-card-label">ID Number</span>
-                        <span className="gen-mobile-card-value">{emp.idNumber}</span>
-                      </div>
-                      <div>
-                        <span className="gen-mobile-card-label">Customers</span>
-                        <span className="gen-mobile-card-value">{emp.customers?.length || 0}</span>
-                      </div>
+                    <div style={{ color: '#60a5fa', fontWeight: '600', fontSize: '0.85rem' }}>
+                      {emp.customers?.length || 0} customers
                     </div>
                   </div>
-                ));
-              })()}
+                ))
+              )}
             </div>
-            <div className="tbl-desktop">
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+
+            {/* Desktop table */}
+            <div className="table-wrap employee-list-scroll customer-table-desktop-only">
+              <table className="customer-table" style={{ borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                    <th style={{ padding: '1rem' }}>ID Number</th>
-                    <th style={{ padding: '1rem' }}>Employee Name</th>
-                    <th style={{ padding: '1rem' }}>Department</th>
-                    <th style={{ padding: '1rem' }}>Customers</th>
+                  <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    <th style={{ padding: '0.75rem 0.5rem' }}>Employee</th>
+                    <th style={{ padding: '0.75rem 0.5rem' }}>ID Number</th>
+                    <th style={{ padding: '0.75rem 0.5rem' }}>Department</th>
+                    <th style={{ padding: '0.75rem 0.5rem' }}>Customers</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {(() => {
-                    const filteredEmployees = employees.filter(e => 
-                      `${e.firstName} ${e.middleName} ${e.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                      e.idNumber.toLowerCase().includes(searchQuery.toLowerCase())
-                    );
-                    const paginatedEmployees = filteredEmployees.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                    return paginatedEmployees.map((emp) => (
-                      <tr
-                        key={emp.id}
-                        style={{
-                          borderBottom: '1px solid var(--border-color)',
-                          fontSize: '0.95rem',
-                          cursor: 'pointer',
-                          background: selectedEmp?.id === emp.id ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
-                          transition: 'background 0.2s'
-                        }}
-                        onClick={() => handleSelectEmployee(emp)}
-                      >
-                        <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--accent-hover)' }}>{emp.idNumber}</td>
-                        <td style={{ padding: '1rem', fontWeight: '500' }}>
+                  {paginatedEmployees.map((emp) => (
+                    <tr
+                      key={emp.id}
+                      style={{
+                        borderBottom: '1px solid var(--border-color)',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        background: selectedEmp?.id === emp.id ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
+                        transition: 'background 0.2s'
+                      }}
+                      onClick={() => handleSelectEmployee(emp)}
+                    >
+                      <td style={{ padding: '0.75rem 0.5rem' }}>
+                        <span
+                          style={{ fontWeight: '700', color: 'var(--accent-hover)', cursor: 'pointer', textDecoration: 'underline', display: 'block' }}
+                          title="Click to view employee details"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/employees?id=${emp.id}`);
+                          }}
+                        >
                           {emp.firstName} {emp.middleName} {emp.lastName}
-                        </td>
-                        <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{emp.department?.departmentName || '-'}</td>
-                        <td style={{ padding: '1rem', textAlign: 'center' }}>
-                          <span style={{ background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
-                            {emp.customers?.length || 0}
-                          </span>
-                        </td>
-                      </tr>
-                    ));
-                  })()}
+                        </span>
+                      </td>
+                      <td style={{ padding: '0.75rem 0.5rem', color: 'var(--text-muted)' }}>{emp.idNumber}</td>
+                      <td style={{ padding: '0.75rem 0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>{emp.department?.departmentName || '-'}</td>
+                      <td style={{ padding: '0.75rem 0.5rem', textAlign: 'center' }}>
+                        <span style={{ background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
+                          {emp.customers?.length || 0}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
-            
+
             {/* Pagination Controls */}
-            {(() => {
-              const filteredEmployees = employees.filter(e => 
-                `${e.firstName} ${e.middleName} ${e.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                e.idNumber.toLowerCase().includes(searchQuery.toLowerCase())
-              );
-              const totalPages = Math.max(1, Math.ceil(filteredEmployees.length / rowsPerPage));
-              return (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
-                  <button 
-                    className="btn-secondary" 
-                    disabled={currentPage === 1} 
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
-                  >
-                    Prev
-                  </button>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button 
-                    className="btn-secondary" 
-                    disabled={currentPage >= totalPages} 
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
-                  >
-                    Next
-                  </button>
-                </div>
-              );
-            })()}
+            <div className="customer-table-desktop-only" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: 'auto', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
+              <button
+                className="btn-secondary"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+              >
+                Prev
+              </button>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                className="btn-secondary"
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+              >
+                Next
+              </button>
+            </div>
           </div>
 
           {/* Employee Details Panel */}
           {selectedEmp && (
-            <div className="glass-panel employee-detail-panel" style={{ padding: '2.5rem', alignSelf: 'start', position: 'sticky', top: '2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
-                <div style={{
-                  width: '64px',
-                  height: '64px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #60a5fa, #3b82f6)',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: '1.5rem',
-                  fontWeight: 'bold',
-                  color: 'white'
-                }}>
-                  {selectedEmp.firstName[0]}
-                  {selectedEmp.lastName[0]}
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '1.5rem' }}>
-                    {selectedEmp.firstName} {selectedEmp.lastName}
-                  </h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                    {selectedEmp.department?.departmentName || 'No Department'}
-                  </p>
+            <div className="glass-panel employee-detail-panel" style={{ display: 'flex', flexDirection: 'column' }}>
+
+              {/* Detailed view header */}
+              <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0, gap: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{
+                    width: '48px', height: '48px', borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #60a5fa, #3b82f6)',
+                    display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    fontSize: '1.1rem', fontWeight: 'bold', color: 'white', flexShrink: 0
+                  }}>
+                    {selectedEmp.firstName[0]}{selectedEmp.lastName[0]}
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 800 }} className="text-gradient">
+                      {selectedEmp.firstName} {selectedEmp.lastName}
+                    </h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0.2rem 0 0 0' }}>
+                      {selectedEmp.department?.departmentName || 'No Department'} · ID: {selectedEmp.idNumber}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-                  <div>
-                    <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>ID Number</label>
-                    <p style={{ fontWeight: '500', fontSize: '1.1rem' }}>{selectedEmp.idNumber}</p>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Middle Name</label>
-                    <p style={{ fontWeight: '500' }}>{selectedEmp.middleName}</p>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Department</label>
-                    <p style={{ fontWeight: '500' }}>{selectedEmp.department?.departmentName || '-'}</p>
-                  </div>
+              {/* Info grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem', paddingBottom: '1rem', flexShrink: 0 }}>
+                <div>
+                  <label style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>ID Number</label>
+                  <p style={{ fontWeight: '600', fontSize: '0.95rem', margin: '0.15rem 0 0 0' }}>{selectedEmp.idNumber}</p>
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Middle Name</label>
+                  <p style={{ fontWeight: '500', fontSize: '0.95rem', margin: '0.15rem 0 0 0' }}>{selectedEmp.middleName || '-'}</p>
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Department</label>
+                  <p style={{ fontWeight: '500', fontSize: '0.95rem', margin: '0.15rem 0 0 0' }}>{selectedEmp.department?.departmentName || '-'}</p>
                 </div>
               </div>
 
@@ -323,47 +326,42 @@ function EmployeesDirectory() {
               ) : (
                 <>
                   {/* Sub Tab Navigation */}
-                  <div style={{ display: 'flex', gap: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem', marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', gap: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem', marginBottom: '1rem', flexShrink: 0 }}>
                     <button
                       onClick={() => setActiveSubTab('invoices')}
                       style={{
-                        background: 'transparent',
-                        border: 'none',
+                        background: 'transparent', border: 'none',
                         color: activeSubTab === 'invoices' ? 'var(--accent-hover)' : 'var(--text-muted)',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        fontSize: '0.95rem',
+                        fontWeight: '600', cursor: 'pointer', fontSize: '0.9rem',
                         paddingBottom: '0.5rem',
                         borderBottom: activeSubTab === 'invoices' ? '2px solid var(--accent-hover)' : '2px solid transparent',
                         transition: 'all 0.2s'
                       }}
                     >
-                      📜 Invoices ({selectedEmp.invoices?.length || 0})
+                      Invoices ({selectedEmp.invoices?.length || 0})
                     </button>
                     <button
                       onClick={() => setActiveSubTab('payments')}
                       style={{
-                        background: 'transparent',
-                        border: 'none',
+                        background: 'transparent', border: 'none',
                         color: activeSubTab === 'payments' ? 'var(--accent-hover)' : 'var(--text-muted)',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        fontSize: '0.95rem',
+                        fontWeight: '600', cursor: 'pointer', fontSize: '0.9rem',
                         paddingBottom: '0.5rem',
                         borderBottom: activeSubTab === 'payments' ? '2px solid var(--accent-hover)' : '2px solid transparent',
                         transition: 'all 0.2s'
                       }}
                     >
-                      💰 Payments ({selectedEmp.payments?.length || 0})
+                      Payments ({selectedEmp.payments?.length || 0})
                     </button>
                   </div>
 
-                  {/* Render Invoices Tab */}
-                  {activeSubTab === 'invoices' && (
-                    <div>
-                      {selectedEmp.invoices && selectedEmp.invoices.length > 0 ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '300px', overflowY: 'auto' }}>
-                          {selectedEmp.invoices.map((inv) => {
+                  {/* Tab Content */}
+                  <div className="employee-tab-content">
+                    {/* Invoices Tab */}
+                    {activeSubTab === 'invoices' && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {selectedEmp.invoices && selectedEmp.invoices.length > 0 ? (
+                          selectedEmp.invoices.map((inv) => {
                             const statusStyle = (() => {
                               const s = inv.computedStatus || inv.status;
                               switch (s) {
@@ -379,77 +377,70 @@ function EmployeesDirectory() {
                             })();
 
                             return (
-                              <div key={inv.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', padding: '0.75rem 1rem', borderRadius: '8px', cursor: 'pointer' }} onClick={() => router.push(`/invoices/${inv.id}`)}>
+                              <div key={inv.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', padding: '0.65rem 0.85rem', borderRadius: '8px', cursor: 'pointer' }} onClick={() => router.push(`/invoices/${inv.id}`)}>
                                 <div>
-                                  <p style={{ fontWeight: '600', margin: 0 }}>{inv.invoiceNumber}</p>
-                                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
-                                    Bill Date: {new Date(inv.createdAt).toLocaleDateString()} | Due: {new Date(inv.paymentDate).toLocaleDateString()}
+                                  <p style={{ fontWeight: '600', margin: 0, fontSize: '0.9rem' }}>{inv.invoiceNumber}</p>
+                                  <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0.15rem 0 0 0' }}>
+                                    Bill: {new Date(inv.createdAt).toLocaleDateString()} · Due: {new Date(inv.paymentDate).toLocaleDateString()}
                                   </p>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                   <div style={{ textAlign: 'right' }}>
-                                    <p style={{ fontWeight: '600', margin: 0 }}>${inv.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                                    <p style={{ fontSize: '0.75rem', color: inv.remainingPayment > 0 ? 'var(--warning)' : 'var(--success)', margin: 0 }}>
-                                      Remaining: ${inv.remainingPayment.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    <p style={{ fontWeight: '600', margin: 0, fontSize: '0.85rem' }}>${inv.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                    <p style={{ fontSize: '0.7rem', color: inv.remainingPayment > 0 ? 'var(--warning)' : 'var(--success)', margin: 0 }}>
+                                      Rem: ${inv.remainingPayment.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </p>
                                   </div>
-                                  <span style={{ ...statusStyle, padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>
+                                  <span style={{ ...statusStyle, padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600', whiteSpace: 'nowrap' }}>
                                     {inv.computedStatus || inv.status}
                                   </span>
                                 </div>
                               </div>
                             );
-                          })}
-                        </div>
-                      ) : (
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '2rem' }}>No billing history found.</p>
-                      )}
-                    </div>
-                  )}
+                          })
+                        ) : (
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '2rem' }}>No billing history found.</p>
+                        )}
+                      </div>
+                    )}
 
-                  {/* Render Payments Tab */}
-                  {activeSubTab === 'payments' && (
-                    <div>
-                      {selectedEmp.payments && selectedEmp.payments.length > 0 ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '300px', overflowY: 'auto' }}>
-                          {selectedEmp.payments.map((pmt) => (
-                            <div key={pmt.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '0.85rem 1.15rem', borderRadius: '8px', cursor: 'pointer' }} onClick={() => router.push(`/invoices/${pmt.invoiceId}`)}>
+                    {/* Payments Tab */}
+                    {activeSubTab === 'payments' && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {selectedEmp.payments && selectedEmp.payments.length > 0 ? (
+                          selectedEmp.payments.map((pmt) => (
+                            <div key={pmt.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '0.65rem 0.85rem', borderRadius: '8px', cursor: 'pointer' }} onClick={() => router.push(`/invoices/${pmt.invoiceId}`)}>
                               <div>
-                                <p style={{ fontWeight: '600', margin: 0, fontSize: '0.95rem' }}>💳 {pmt.paymentMethod} Receipt</p>
-                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                  Invoice: <strong style={{ color: 'var(--accent-hover)' }}>{pmt.invoiceNumber}</strong>
-                                  {pmt.bank && ` | Bank: ${pmt.bank}`}
-                                  {pmt.chequeNumber && ` | Cheque: ${pmt.chequeNumber}`}
+                                <p style={{ fontWeight: '600', margin: 0, fontSize: '0.9rem' }}>{pmt.paymentMethod} Receipt</p>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                  Inv: <strong style={{ color: 'var(--accent-hover)' }}>{pmt.invoiceNumber}</strong>
+                                  {pmt.bank && ` · ${pmt.bank}`}
+                                  {pmt.chequeNumber && ` · Chq# ${pmt.chequeNumber}`}
                                 </span>
                               </div>
-                              <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                              <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                 <div>
-                                  <p style={{ fontWeight: '700', color: 'var(--success)', margin: 0 }}>+${pmt.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                                  <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: 0 }}>Recd: {new Date(pmt.receivedDate).toLocaleDateString()}</p>
+                                  <p style={{ fontWeight: '700', color: 'var(--success)', margin: 0, fontSize: '0.85rem' }}>+${pmt.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                  <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', margin: 0 }}>Recd: {new Date(pmt.receivedDate).toLocaleDateString()}</p>
                                 </div>
-                                <span style={{ background: pmt.status === 'Collected' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)', color: pmt.status === 'Collected' ? 'var(--success)' : 'var(--warning)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>
+                                <span style={{ background: pmt.status === 'Collected' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)', color: pmt.status === 'Collected' ? 'var(--success)' : 'var(--warning)', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600' }}>
                                   {pmt.status}
                                 </span>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '2rem' }}>No payment receipts found.</p>
-                      )}
-                    </div>
-                  )}
+                          ))
+                        ) : (
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '2rem' }}>No payment receipts found.</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
             </div>
           )}
         </div>
       )}
-      <div className="sticky-footer-bar no-print">
-        <button className="btn-primary" onClick={() => router.push('/employees/new')} style={{ padding: '0.45rem 1rem', fontSize: '0.82rem', width: 'auto' }}>
-          ➕ Register Employee
-        </button>
-      </div>
     </div>
   );
 }

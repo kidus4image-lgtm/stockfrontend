@@ -112,7 +112,7 @@ export default function CreateOrderPage() {
 
   return (
     <div className="dashboard-container">
-      <header style={{
+      <header className="order-page-header page-header" style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         marginBottom: '2.5rem', background: 'linear-gradient(135deg, rgba(23,79,73,0.15), rgba(16,185,129,0.08))',
         padding: '1.5rem 2rem', borderRadius: '16px', border: '1px solid rgba(16,185,129,0.15)'
@@ -138,7 +138,7 @@ export default function CreateOrderPage() {
       </header>
 
       <form onSubmit={handleSubmit}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div className="order-top-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
           <div className="glass-panel" style={{ padding: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
               <span style={{ fontSize: '1.2rem' }}>👤</span>
@@ -206,7 +206,7 @@ export default function CreateOrderPage() {
         </div>
 
         <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
-          <div style={{
+          <div className="order-items-header" style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             marginBottom: '1.25rem', paddingBottom: '0.75rem',
             borderBottom: '1px solid rgba(255,255,255,0.06)'
@@ -246,7 +246,7 @@ export default function CreateOrderPage() {
                 const hasProduct = !!item.productObj;
                 const rowTotal = item.price * item.quantity;
                 return (
-                  <div key={index} style={{
+                  <div key={index} className="order-item-row" style={{
                     display: 'grid', gridTemplateColumns: '2.5fr 1fr 1fr auto',
                     gap: '0.75rem', alignItems: 'center',
                     padding: '1rem', borderRadius: '10px',
@@ -320,46 +320,32 @@ export default function CreateOrderPage() {
           )}
         </div>
 
-        <div style={{
-          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
+        <div style={{ height: '4rem' }} />
+        <div className="sticky-footer-bar" style={{
           background: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(20px)',
           borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1rem 2rem',
-          display: 'flex', justifyContent: 'center', alignItems: 'center',
           boxShadow: '0 -10px 30px rgba(0,0,0,0.5)'
         }}>
-          <div style={{ display: 'flex', gap: '1rem', width: '100%', maxWidth: '1200px', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Total:</span>
-                <span style={{
-                  fontSize: '1.5rem', fontWeight: 800,
-                  color: totalAmount > 0 ? '#10b981' : 'var(--text-muted)',
-                  transition: 'color 0.3s'
-                }}>
-                  ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                </span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  ({totalItems} item{totalItems !== 1 ? 's' : ''})
-                </span>
-              </div>
-            </div>
-
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Total: <strong style={{ fontSize: '1.2rem', fontWeight: 800, color: totalAmount > 0 ? '#10b981' : 'var(--text-muted)' }}>
+              ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </strong>
+            <span style={{ fontSize: '0.8rem', marginLeft: '0.4rem' }}>({totalItems} item{totalItems !== 1 ? 's' : ''})</span>
+          </span>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button type="submit" className="btn-primary"
+              disabled={submitting || items.length === 0 || !selectedCustomerId}
+              style={{
+                padding: '0.45rem 1rem', fontSize: '0.82rem', width: 'auto', fontWeight: 700,
+                background: (submitting || items.length === 0 || !selectedCustomerId) ? 'rgba(16, 185, 129, 0.3)' : 'linear-gradient(135deg, #10b981, #059669)',
+                border: 'none', color: '#fff', cursor: (submitting || items.length === 0 || !selectedCustomerId) ? 'not-allowed' : 'pointer',
+              }}>
+              {submitting ? '⏳ Processing...' : '🚀 Submit Order'}
+            </button>
+            <button type="button" className="btn-secondary" onClick={() => router.back()} style={{ padding: '0.45rem 1rem', fontSize: '0.82rem', width: 'auto' }}>
+              Cancel
+            </button>
           </div>
-        </div>
-        <div style={{ height: '5rem' }} />
-        <div className="sticky-footer-bar">
-          <button type="submit" className="btn-primary"
-            disabled={submitting || items.length === 0 || !selectedCustomerId}
-            style={{
-              padding: '0.45rem 1rem', fontSize: '0.82rem', width: 'auto', fontWeight: 700,
-              background: (submitting || items.length === 0 || !selectedCustomerId) ? 'rgba(16, 185, 129, 0.3)' : 'linear-gradient(135deg, #10b981, #059669)',
-              border: 'none', color: '#fff', cursor: (submitting || items.length === 0 || !selectedCustomerId) ? 'not-allowed' : 'pointer',
-            }}>
-            {submitting ? '⏳ Processing...' : '🚀 Submit Order'}
-          </button>
-          <button type="button" className="btn-secondary" onClick={() => router.back()} style={{ padding: '0.45rem 1rem', fontSize: '0.82rem', width: 'auto' }}>
-            Cancel
-          </button>
         </div>
       </form>
     </div>

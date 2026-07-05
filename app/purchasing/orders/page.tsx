@@ -429,7 +429,7 @@ export default function PurchaseOrdersPage() {
 
   // ─── render ───────────────────────────────────────────────────────
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container employee-page-shell">
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
         <div>
           <h1 className="text-gradient" style={{ fontSize: '1.75rem', margin: 0 }}>Purchase Orders</h1>
@@ -456,7 +456,8 @@ export default function PurchaseOrdersPage() {
         <ReportExportToolbar exportOptions={poExportConfig} variant="compact" disabled={filtered.length === 0} />
       </div>
 
-      <div className="glass-panel" style={{ padding: '1rem' }}>
+      <div className="employee-grid" style={{ flex: 1, minHeight: 0 }}>
+      <div className="glass-panel employee-list-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
           <input type="text" placeholder="Search PO number, supplier..." className="form-control"
             style={{ maxWidth: '280px', padding: '0.4rem 0.75rem', fontSize: '0.8rem' }}
@@ -467,7 +468,28 @@ export default function PurchaseOrdersPage() {
           </select>
         </div>
 
-        <div className="table-wrap">
+        <div className="customer-mobile-search-results">
+          {filtered.length > 0 ? filtered.slice((page - 1) * rowsPerPage, page * rowsPerPage).map(o => (
+            <div key={o.id} className="customer-mobile-search-item" onClick={() => viewDetails(o.id)}>
+              <div>
+                <strong style={{ color: 'var(--accent-hover)', fontSize: '0.85rem' }}>{o.poNumber}</strong>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                  {o.supplier.name} · {fmtDate(o.orderDate)}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>${o.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                <span style={{ padding: '0.15rem 0.5rem', borderRadius: '8px', fontSize: '0.65rem', fontWeight: 600, background: (STATUS_META[o.status] || { bg: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)' }).bg, color: (STATUS_META[o.status] || { bg: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)' }).color }}>
+                  {(STATUS_META[o.status] || { label: o.status }).label}
+                </span>
+              </div>
+            </div>
+          )) : (
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '1.5rem' }}>No purchase orders found.</p>
+          )}
+        </div>
+
+        <div className="table-wrap employee-list-scroll customer-table-desktop-only">
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
@@ -532,14 +554,15 @@ export default function PurchaseOrdersPage() {
               )}
             </tbody>
           </table>
-          {filtered.length > rowsPerPage && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', marginTop: '0.6rem' }}>
-              <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={page === 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
-              <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', padding: '0 0.4rem' }}>{page} / {Math.ceil(filtered.length / rowsPerPage)}</span>
-              <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={page >= Math.ceil(filtered.length / rowsPerPage)} onClick={() => setPage(p => p + 1)}>Next →</button>
-            </div>
-          )}
         </div>
+        {filtered.length > rowsPerPage && (
+          <div className="customer-table-desktop-only" style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', marginTop: '0.6rem' }}>
+            <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={page === 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
+            <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', padding: '0 0.4rem' }}>{page} / {Math.ceil(filtered.length / rowsPerPage)}</span>
+            <button className="btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.7rem', width: 'auto' }} disabled={page >= Math.ceil(filtered.length / rowsPerPage)} onClick={() => setPage(p => p + 1)}>Next →</button>
+          </div>
+        )}
+      </div>
       </div>
 
       {showCreateModal && <FormModal />}
