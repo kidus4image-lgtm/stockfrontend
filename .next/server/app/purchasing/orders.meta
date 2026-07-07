@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/purchasing/layout,_N_T_/purchasing/orders/layout,_N_T_/purchasing/orders/page,_N_T_/purchasing/orders"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/purchasing/orders/__PAGE__",
+    "/purchasing/orders",
+    "/purchasing",
+    "/_index",
+    "/_head"
+  ]
+}

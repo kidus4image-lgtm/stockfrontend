@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/inventory/layout,_N_T_/inventory/reserved/layout,_N_T_/inventory/reserved/page,_N_T_/inventory/reserved"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/inventory/reserved/__PAGE__",
+    "/inventory/reserved",
+    "/inventory",
+    "/_index",
+    "/_head"
+  ]
+}

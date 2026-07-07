@@ -1,9 +1,12 @@
 ---
+# `next build` is NOT run here — the shared host's memory limit (LVE) is too
+# low for it and it OOMs. Run `npm run build` locally and commit the
+# resulting `.next` directory before pushing; this task only deploys the
+# already-built output and installs production dependencies.
 deployment:
   tasks:
     - export DEPLOYPATH=/home/USERNAME/APPDIR/
     - /bin/cp -R ./* $DEPLOYPATH
     - /bin/cp -R ./.next $DEPLOYPATH
     - cd $DEPLOYPATH && npm install --omit=dev
-    - cd $DEPLOYPATH && npm run build
     - /bin/touch $DEPLOYPATH/tmp/restart.txt

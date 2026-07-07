@@ -1,0 +1,3 @@
+{
+  "/orders/[id]/assign-batches/page": "app/orders/[id]/assign-batches/page.js"
+}

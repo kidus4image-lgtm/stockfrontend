@@ -14,8 +14,13 @@
 /coverage
 
 # next.js
-/.next/
 /out/
+/.next/cache
+/.next/dev
+/.next/trace
+/.next/trace-build
+/.next/diagnostics
+/.next/turbopack
 
 # production
 /build
