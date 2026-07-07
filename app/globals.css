@@ -379,6 +379,7 @@ tr.hover-row:hover {
   }
 
   .main-content {
+    margin-left: 270px;
     padding: 2.5rem;
     overflow-y: auto;
   }
@@ -757,6 +758,10 @@ tr.hover-row:hover {
     right: 0;
     height: 64px;
     padding: 0 2rem;
+  }
+
+  .top-nav-hamburger {
+    display: none !important;
   }
 
   .sidebar {

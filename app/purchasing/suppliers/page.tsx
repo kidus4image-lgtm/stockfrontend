@@ -198,8 +198,8 @@ export default function SuppliersPage() {
         </div>
       </header>
 
-      <div className="employee-grid" style={{ flex: 1, minHeight: 0 }}>
-      <div className="glass-panel employee-list-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, minHeight: 0 }}>
+      <div className="glass-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', gap: '1rem' }}>
           <h2 className="text-gradient" style={{ fontSize: '1.1rem', margin: 0 }}>Supplier Directory</h2>
           <input

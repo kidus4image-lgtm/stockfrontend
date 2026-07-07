@@ -497,8 +497,8 @@ function PurchasesPageInner() {
         <ReportExportToolbar exportOptions={exportConfig} variant="compact" disabled={filtered.length === 0} />
       </div>
 
-      <div className="employee-grid" style={{ flex: 1, minHeight: 0 }}>
-      <div className="glass-panel employee-list-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, minHeight: 0 }}>
+      <div className="glass-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', alignItems: 'center' }}>
           <button className="btn-secondary" onClick={openFilterModal} style={{ padding: '0.35rem 0.85rem', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '0.4rem', border: activeFilterCount > 0 ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.12)', color: activeFilterCount > 0 ? 'var(--accent-hover)' : 'var(--text-muted)' }}>
             ⚙ Filters{activeFilterCount > 0 && <span style={{ background: 'var(--accent)', color: '#fff', borderRadius: '999px', padding: '0 0.4rem', fontSize: '0.65rem', fontWeight: 700 }}>{activeFilterCount}</span>}

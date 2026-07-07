@@ -71,7 +71,11 @@ export default function SyncDashboard() {
     setSyncing(type);
     setMessage(null);
     try {
-      const endpoint = type === 'all' ? `${SYNC_HUB_URL}/api/sync/all/push` : `${SYNC_HUB_URL}/api/sync/${type}/push`;
+      const endpoint = type === 'all'
+        ? `${SYNC_HUB_URL}/api/sync/all/push`
+        : type === 'orders'
+          ? `${SYNC_HUB_URL}/api/sync/orders/pull`
+          : `${SYNC_HUB_URL}/api/sync/${type}/push`;
       const res = await fetch(endpoint, { method: 'POST' });
       if (res.ok) {
         setMessage({ type: 'success', text: `Sync ${type} started successfully!` });
@@ -215,6 +219,18 @@ export default function SyncDashboard() {
                       <span>📥</span>
                     )}
                     Sync Purchases
+                  </button>
+                  <button
+                    onClick={() => handleSync('orders')}
+                    disabled={syncing !== null}
+                    className="px-6 py-3 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 rounded-lg font-medium flex items-center gap-2 transition-all"
+                  >
+                    {syncing === 'orders' ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    ) : (
+                      <span>🧾</span>
+                    )}
+                    Sync Orders
                   </button>
                 </div>
               </div>

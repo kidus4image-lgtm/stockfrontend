@@ -456,8 +456,8 @@ export default function PurchaseOrdersPage() {
         <ReportExportToolbar exportOptions={poExportConfig} variant="compact" disabled={filtered.length === 0} />
       </div>
 
-      <div className="employee-grid" style={{ flex: 1, minHeight: 0 }}>
-      <div className="glass-panel employee-list-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, minHeight: 0 }}>
+      <div className="glass-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
           <input type="text" placeholder="Search PO number, supplier..." className="form-control"
             style={{ maxWidth: '280px', padding: '0.4rem 0.75rem', fontSize: '0.8rem' }}

@@ -148,10 +148,38 @@ export default function TopNav() {
     return null;
   }
 
+  const toggleSidebar = () => {
+    const sidebar = document.querySelector('.sidebar') as HTMLElement;
+    if (sidebar) {
+      sidebar.classList.toggle('mobile-open');
+    }
+  };
+
   return (
     <header className="top-nav">
-      {/* LEFT: BRANDING & COMPANY LOGO */}
-      <div className="top-nav-left">
+      {/* LEFT: HAMBURGER + BRANDING */}
+      <div className="top-nav-left" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <button
+          className="top-nav-hamburger"
+          onClick={toggleSidebar}
+          aria-label="Toggle navigation"
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '8px',
+            width: '36px',
+            height: '36px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            fontSize: '1.2rem',
+            color: '#e2e8f0',
+            flexShrink: 0,
+          }}
+        >
+          ☰
+        </button>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
           {settings?.companyLogo ? (
             <img 
